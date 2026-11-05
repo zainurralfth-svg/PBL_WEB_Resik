@@ -31,10 +31,15 @@ class B3Pendaftaran extends Model
         'est_berat',
         'status',
         'id_petugas',
+        'total_imbalan',
+        'catatan_verifikasi',
+        'tgl_verifikasi',
     ];
 
     protected $casts = [
         'est_berat' => 'decimal:2',
+        'total_imbalan' => 'decimal:2',
+        'tgl_verifikasi' => 'datetime',
     ];
 
     /** B3Periode dibuat oleh temanmu; relasi ini baru dipakai kalau modelnya sudah ada. */
@@ -64,9 +69,19 @@ class B3Pendaftaran extends Model
         return $this->belongsTo(Desa::class, 'id_desa', 'id_desa');
     }
 
+    public function getNamaDesaAttribute(): string
+    {
+        return $this->desa->nama_desa ?? '-';
+    }
+
     public function petugas(): BelongsTo
     {
         return $this->belongsTo(Petugas::class, 'id_petugas', 'id_petugas');
+    }
+
+    public function getPetugasNamaAttribute(): string
+    {
+        return $this->petugas->nama_lengkap ?? $this->petugas->nama ?? '-';
     }
 
     public function items(): HasMany
@@ -98,6 +113,21 @@ class B3Pendaftaran extends Model
             ->implode(', ');
     }
 
+    /** Teks barang yang dibawa petugas di lapangan. Jika masih dijadwalkan, tampil '-' */
+    public function getItemsDibawaPetugasTextAttribute(): string
+    {
+        if ($this->status === self::DIJADWALKAN || $this->status === self::TERDAFTAR) {
+            return '-';
+        }
+
+        $list = $this->items->map(function ($item) {
+            $jml = $item->jumlah_petugas ?? $item->jumlah_verifikasi ?? $item->jumlah;
+            return "{$item->jenis_b3} x{$jml}";
+        })->filter();
+
+        return $list->isNotEmpty() ? $list->implode(', ') : '-';
+    }
+
     /** "1,2 kg", "2 kg" */
     public function getEstBeratLabelAttribute(): string
     {
@@ -109,5 +139,11 @@ class B3Pendaftaran extends Model
     public function getStatusLabelAttribute(): string
     {
         return self::STATUS_LABEL[$this->status] ?? $this->status;
+    }
+
+    /** Format total rupiah insentif / imbalan: misal 'Rp 9.000' */
+    public function getTotalImbalanLabelAttribute(): string
+    {
+        return 'Rp ' . number_format((float) $this->total_imbalan, 0, ',', '.');
     }
 }

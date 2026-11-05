@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\SubAdminDashboardController;
 use App\Http\Controllers\BankSampah\PenarikanController;
 use App\Http\Controllers\BankSampah\PenjemputanController;
 use App\Http\Controllers\BankSampah\B3PendaftaranController;
+use App\Http\Controllers\BankSampah\B3VerifikasiController;
 use App\Http\Controllers\BankSampah\SetorController;
 
 /*
@@ -201,7 +202,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
                 // SEMENTARA: penanda tab milik teman. HAPUS route penanda ini kalau route aslinya sudah dibuat.
                 Route::view('/periode', 'admin.bank-sampah.B3.Index', ['tab' => 'periode'])->name('periode.index');
-                Route::view('/verifikasi', 'admin.bank-sampah.B3.Index', ['tab' => 'verifikasi'])->name('verifikasi.index');
+                // Tab Verifikasi
+                Route::get('/verifikasi', [B3VerifikasiController::class, 'index'])->name('verifikasi.index');
+                Route::post('/verifikasi/{id}', [B3VerifikasiController::class, 'simpan'])
+                    ->whereNumber('id')
+                    ->name('verifikasi.simpan');
+                Route::post('/verifikasi/{id}/tidak-sesuai', [B3VerifikasiController::class, 'tidakSesuai'])
+                    ->whereNumber('id')
+                    ->name('verifikasi.tidak-sesuai');
                 Route::view('/rekap', 'admin.bank-sampah.B3.Index', ['tab' => 'rekap'])->name('rekap.index');
             });
 

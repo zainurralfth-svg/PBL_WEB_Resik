@@ -5,12 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Hanya tabel untuk bagian PENDAFTARAN B3. Tabel periode & serah terima dibuat temanmu.
- *
- * Tipe kolom disamakan dengan database RESIK:
- *   masyarakat.id_masyarakat, pns.id_pns, petugas.id_petugas = int; desa.id_desa = bigint unsigned.
- * id_periode sengaja TANPA foreign key, supaya migration ini bisa jalan walau tabel periode
- * belum dibuat. Tambahkan foreign key-nya belakangan kalau tabel periode sudah final.
+ * Tabel untuk pendaftaran & verifikasi B3.
  */
 return new class extends Migration
 {
@@ -27,6 +22,9 @@ return new class extends Migration
                 ->default('terdaftar')
                 ->index();
             $table->integer('id_petugas')->nullable()->index();
+            $table->decimal('total_imbalan', 12, 2)->default(0);
+            $table->text('catatan_verifikasi')->nullable();
+            $table->timestamp('tgl_verifikasi')->nullable();
             $table->timestamps();
         });
 
@@ -35,6 +33,10 @@ return new class extends Migration
             $table->foreignId('id_pendaftaran')->constrained('b3_pendaftarans')->cascadeOnDelete();
             $table->string('jenis_b3', 100);
             $table->unsignedInteger('jumlah')->default(1);
+            $table->unsignedInteger('jumlah_petugas')->nullable();
+            $table->unsignedInteger('jumlah_verifikasi')->nullable();
+            $table->decimal('harga_satuan', 12, 2)->default(0);
+            $table->decimal('subtotal', 12, 2)->default(0);
             $table->timestamps();
         });
     }

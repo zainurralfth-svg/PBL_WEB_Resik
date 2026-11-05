@@ -1,0 +1,163 @@
+/* B3 - gaya khusus tab VERIFIKASI sesuai Figma */
+
+/* Pembagian kolom untuk tabel Verifikasi (7 kolom) */
+.b3-table--verifikasi th:nth-child(1),
+.b3-table--verifikasi td:nth-child(1) { width: 17%; text-align: left; }
+
+.b3-table--verifikasi th:nth-child(2),
+.b3-table--verifikasi td:nth-child(2) { width: 12%; text-align: left; }
+
+.b3-table--verifikasi th:nth-child(3),
+.b3-table--verifikasi td:nth-child(3) { width: 17%; text-align: left; }
+
+.b3-table--verifikasi th:nth-child(4),
+.b3-table--verifikasi td:nth-child(4) { width: 17%; text-align: left; }
+
+.b3-table--verifikasi th:nth-child(5),
+.b3-table--verifikasi td:nth-child(5) { width: 11%; text-align: left; }
+
+.b3-table--verifikasi th:nth-child(6),
+.b3-table--verifikasi td:nth-child(6) { width: 14%; text-align: center; }
+
+.b3-table--verifikasi th:nth-child(7),
+.b3-table--verifikasi td:nth-child(7) { width: 12%; text-align: center; }
+
+/* Tombol Verifikasi hijau di kolom Aksi */
+.b3-btn-verifikasi {
+    display: inline-block;
+    background-color: #2e8b57;
+    color: #ffffff;
+    border: none;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.b3-btn-verifikasi:hover {
+    background-color: #246d44;
+}
+
+.b3-btn-verifikasi:focus-visible {
+    outline: 2px solid #1b5e32;
+    outline-offset: 2px;
+}
+
+/* Nilai Rupiah untuk yang sudah Diverifikasi */
+.b3-nominal-aksi {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    display: inline-block;
+}
+
+/* Modal Verifikasi */
+.b3-modal-verifikasi {
+    margin: auto;
+    width: min(440px, 94vw);
+    padding: 24px 28px;
+    border: 0;
+    border-radius: 14px;
+    background: #e8ece9;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+
+.b3-modal-verifikasi::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.b3-modal-verifikasi__header {
+    margin-bottom: 16px;
+}
+
+.b3-modal-verifikasi__title {
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #2e8b57;
+}
+
+.b3-modal-verifikasi__subtitle {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #4a4a4a;
+    line-height: 1.4;
+}
+
+.b3-modal-verifikasi__body {
+    margin: 18px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.b3-modal-item-row label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.82rem;
+    color: #2d2d2d;
+    font-weight: 500;
+}
+
+.b3-modal-verifikasi input[type="number"],
+.b3-modal-verifikasi input[type="text"] {
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 0.95rem;
+    background: #fdfdfd;
+    border: 1px solid #b8bec2;
+    border-radius: 8px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.b3-modal-verifikasi input[type="number"]:focus,
+.b3-modal-verifikasi input[type="text"]:focus {
+    border-color: #2e8b57;
+    background: #ffffff;
+    box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.2);
+}
+
+.b3-modal-verifikasi__actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.b3-btn-tidak-sesuai {
+    background-color: #eb5757;
+    color: #ffffff;
+    border: none;
+    padding: 9px 18px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.b3-btn-tidak-sesuai:hover {
+    background-color: #d63d3d;
+}
+
+.b3-btn-simpan-verifikasi {
+    background-color: #2e8b57;
+    color: #ffffff;
+    border: none;
+    padding: 9px 18px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.b3-btn-simpan-verifikasi:hover {
+    background-color: #246d44;
+}
+

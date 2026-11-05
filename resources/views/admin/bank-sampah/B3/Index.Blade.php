@@ -10,6 +10,7 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/b3.css?v=' . time()) }}">
     <link rel="stylesheet" href="{{ asset('css/b3-pendaftaran.css?v=' . time()) }}">
+    <link rel="stylesheet" href="{{ asset('css/b3-verifikasi.css?v=' . time()) }}">
 @endpush
 
 @section('content')
