@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\SubAdminDashboardController;
 // ✅ BankSampah Controllers
 use App\Http\Controllers\BankSampah\PenarikanController;
 use App\Http\Controllers\BankSampah\PenjemputanController;
+use App\Http\Controllers\BankSampah\B3PendaftaranController;
 use App\Http\Controllers\BankSampah\SetorController;
 
 /*
@@ -188,6 +189,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 Route::delete('/{id}/reject', [PenjemputanController::class, 'reject'])->name('reject');
                 Route::post('/store', [PenjemputanController::class, 'storeFromAdmin'])->name('store');
                 Route::get('/list/{adminId}', [PenjemputanController::class, 'indexByAdmin'])->name('list');
+            });
+
+            // ── B3: Penjemputan Berperiode ──
+            Route::prefix('b3')->name('b3.')->group(function () {
+                // Tab Pendaftaran
+                Route::get('/pendaftaran', [B3PendaftaranController::class, 'index'])->name('pendaftaran.index');
+                Route::post('/pendaftaran/{id}/tugaskan', [B3PendaftaranController::class, 'tugaskan'])
+                    ->whereNumber('id')
+                    ->name('pendaftaran.tugaskan');
+
+                // SEMENTARA: penanda tab milik teman. HAPUS route penanda ini kalau route aslinya sudah dibuat.
+                Route::view('/periode', 'admin.bank-sampah.B3.Index', ['tab' => 'periode'])->name('periode.index');
+                Route::view('/verifikasi', 'admin.bank-sampah.B3.Index', ['tab' => 'verifikasi'])->name('verifikasi.index');
+                Route::view('/rekap', 'admin.bank-sampah.B3.Index', ['tab' => 'rekap'])->name('rekap.index');
             });
 
             // ── Setor Sampah ──

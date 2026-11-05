@@ -83,6 +83,12 @@
                             <span id="badge-penjemputan" class="notif-badge" style="display:none;">0</span>
                         </span>
                     </li>
+                    <li>
+                        <a href="{{ route('admin.bank-sampah.b3.pendaftaran.index') }}"
+                            class="{{ request()->routeIs('admin.bank-sampah.b3*') ? 'active' : '' }}">
+                            B3
+                        </a>
+                    </li>
                 </ul>
             </li>
 
