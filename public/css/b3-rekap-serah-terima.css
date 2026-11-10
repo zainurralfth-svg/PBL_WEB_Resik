@@ -1,0 +1,23 @@
+/* CSS desain "B3 - Rekap (modal catat serah terima)" */
+.b3-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:1000}
+.b3-overlay.show{display:flex}
+.b3-modal,.b3-modal *{box-sizing:border-box}
+.b3-modal{background:#f1f1f1;border-radius:18px;padding:20px 22px 18px;width:100%;max-width:400px;box-shadow:0 10px 30px rgba(0,0,0,.25);animation:b3pop .2s}
+@keyframes b3pop{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.b3-modal h2{font-size:16px;font-weight:600;color:#2f8f5b;letter-spacing:.3px;margin:0 0 10px}
+.b3-field{margin-bottom:10px}
+.b3-field label{display:block;font-size:11px;font-weight:500;color:#222;margin-bottom:3px}
+.b3-field input,.b3-field select,.b3-upload{display:flex;align-items:center;width:100%;height:38px;padding:0 12px;border:1px solid #cfcfcf;border-radius:8px;font-size:13px;color:#222;background:#f8f8f8;font-family:inherit}
+.b3-field select{appearance:none}
+.b3-field input::placeholder{color:#8a8a8a}
+.b3-field input:focus,.b3-field select:focus{outline:2px solid #9bd3b4;border-color:#2f8f5b}
+.b3-upload{color:#8a8a8a;cursor:pointer}
+.b3-upload.has-file{color:#222}
+.b3-err{color:#dc2626;font-size:11px;margin-top:3px;display:none}
+.b3-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.b3-btn{border:none;background:#d4d4d4;color:#333;padding:0 16px;height:30px;border-radius:6px;font-size:12px;cursor:pointer}
+.b3-btn:hover{background:#c6c6c6}
+.b3-btn.primary{background:#2f8f5b;color:#fff}
+.b3-btn.primary:hover{background:#277a4d}
+.b3-toast{position:fixed;bottom:20px;right:20px;background:#2f8f5b;color:#fff;padding:12px 18px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.3s;z-index:1100}
+.b3-toast.show{opacity:1;transform:none}
