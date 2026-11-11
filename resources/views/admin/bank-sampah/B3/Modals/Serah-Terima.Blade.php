@@ -1,4 +1,8 @@
 {{-- Modal Catat Serah Terima (tampilan saja) --}}
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/b3-rekap-serah-terima.css?v=' . time()) }}">
+@endpush
+
 <div class="rs-overlay" id="rs-overlay">
     <div class="rs-modal">
         <h2>Catat Serah Terima</h2>
@@ -26,3 +30,5 @@
         </div>
     </div>
 </div>
+
+<div class="rs-toast" id="rs-toast"></div>
