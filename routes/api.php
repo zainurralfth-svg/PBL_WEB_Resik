@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\PenjemputanController;
 use App\Http\Controllers\Api\RiwayatSetorAdminController;
 use App\Http\Controllers\Api\RiwayatPenjemputanController;
 use App\Http\Controllers\Api\KonfirmasiSetorController;
+use App\Http\Controllers\Api\B3WargaController;
 
 
 // ==================== 🔓 PUBLIC ROUTES (Tanpa Login) ====================
@@ -33,6 +34,9 @@ Route::get('/notifications', [App\Http\Controllers\Api\NotificationController::c
 Route::get('/notifications/unread-count', [App\Http\Controllers\Api\NotificationController::class, 'unreadCount']);
 Route::put('/notifications/{id}/read', [App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
 Route::put('/notifications/mark-all-read', [App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
+
+// B3: periode yang dibuat admin di web (hanya baca, untuk layar Sampah B3 warga)
+Route::get('/b3/periode-aktif', [B3WargaController::class, 'periodeAktif']);
 
 Route::get('/kecamatan', [KecamatanController::class, 'index']);
 Route::get('/desa', [DesaController::class, 'index']); // Support ?kecamatan_id= filter

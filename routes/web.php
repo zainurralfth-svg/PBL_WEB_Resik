@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\SubAdminDashboardController;
 // ✅ BankSampah Controllers
 use App\Http\Controllers\BankSampah\PenarikanController;
 use App\Http\Controllers\BankSampah\PenjemputanController;
+use App\Http\Controllers\BankSampah\B3Controller;
 use App\Http\Controllers\BankSampah\B3PendaftaranController;
 use App\Http\Controllers\BankSampah\B3VerifikasiController;
 use App\Http\Controllers\BankSampah\SetorController;
@@ -200,8 +201,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
                     ->whereNumber('id')
                     ->name('pendaftaran.tugaskan');
 
-                // SEMENTARA: penanda tab milik teman. HAPUS route penanda ini kalau route aslinya sudah dibuat.
-                Route::view('/periode', 'admin.bank-sampah.B3.Index', ['tab' => 'periode'])->name('periode.index');
+                // Tab Periode
+                Route::get('/periode', [B3Controller::class, 'index'])->name('periode.index');
+                Route::post('/periode', [B3Controller::class, 'store'])->name('periode.store');
+                Route::post('/periode/{id}/tugaskan', [B3Controller::class, 'tugaskan'])
+                    ->whereNumber('id')
+                    ->name('periode.tugaskan');
+
                 // Tab Verifikasi
                 Route::get('/verifikasi', [B3VerifikasiController::class, 'index'])->name('verifikasi.index');
                 Route::post('/verifikasi/{id}', [B3VerifikasiController::class, 'simpan'])
