@@ -30,9 +30,18 @@
             'rekap'       => ['Rekap',       'admin.bank-sampah.b3.rekap.index'],
         ];
 
+        // Sub admin desa hanya melihat tab Pendaftaran dan Rekap
+        $adalahSubDesa = $adminB3 && method_exists($adminB3, 'isSubAdminDesa') && $adminB3->isSubAdminDesa();
+        if ($adalahSubDesa) {
+            $daftarTab = array_intersect_key($daftarTab, array_flip(['pendaftaran', 'rekap']));
+        }
+
         // Tab milik orang lain yang filenya masih kosong -> tampilkan penanda
         $berkasTab = resource_path('views/admin/bank-sampah/B3/Tabs/' . ucfirst($tab) . '.blade.php');
         $tabKosong = $tab !== 'pendaftaran' && (! is_file($berkasTab) || filesize($berkasTab) === 0);
+
+        // Tab Rekap untuk sub admin desa memakai tampilan sendiri
+        $viewTab = ($adalahSubDesa && $tab === 'rekap') ? 'Rekap-Sub-Desa' : ucfirst($tab);
     @endphp
 
     <div class="b3-top">
@@ -70,7 +79,7 @@
         @if ($tabKosong)
             <p style="margin-top:28px;color:#555">Tab <strong>{{ ucfirst($tab) }}</strong> sedang dikerjakan.</p>
         @else
-            @include('admin.bank-sampah.B3.Tabs.' . ucfirst($tab))
+            @include('admin.bank-sampah.B3.Tabs.' . $viewTab)
         @endif
     </div>
 @endsection

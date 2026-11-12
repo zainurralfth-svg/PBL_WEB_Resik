@@ -21,7 +21,7 @@
             <li class="nav-item {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.sub-admin.dashboard') ? 'active' : '' }}">
                 <a href="{{ $isSubAdmin ? route('admin.sub-admin.dashboard') : route('admin.dashboard') }}">
                     <img src="{{ asset('assets/icons/beranda.png') }}" alt="Beranda" class="custom-icon">
-                    <span>{{ $isSubAdmin ? 'Dashboard Bank Sampah' : 'Beranda' }}</span>
+                    <span>{{ $isSubAdmin ? 'Beranda' : 'Beranda' }}</span>
                 </a>
             </li>
 
@@ -57,32 +57,35 @@
                             Data Setor
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('admin.bank-sampah.penarikan.index') }}"
-                            class="{{ request()->routeIs('admin.bank-sampah.penarikan.index') ? 'active' : '' }}">
-                            Data Penarikan
-                        </a>
-                        <span class="notif-badge-wrapper" onclick="openNotifModal('penarikan')" title="Lihat notifikasi">
-                            <span id="badge-penarikan" class="notif-badge" style="display:none;">0</span>
-                        </span>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.bank-sampah.jenis-sampah.index') }}"
-                            class="{{ request()->routeIs('admin.bank-sampah.jenis-sampah.index') ? 'active' : '' }}">
-                            Jenis & Harga Sampah
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.bank-sampah.penjemputan.index') }}"
-                            class="{{ request()->routeIs('admin.bank-sampah.penjemputan*') ? 'active' : '' }}">
-                            Penjemputan
-                        </a>
-                        <span class="notif-badge-wrapper"
-                            onclick="openNotifModal('penjemputan'); event.stopPropagation(); return false;"
-                            title="Lihat notifikasi">
-                            <span id="badge-penjemputan" class="notif-badge" style="display:none;">0</span>
-                        </span>
-                    </li>
+                    {{-- Sub admin desa hanya melihat Data Setor dan B3 --}}
+                    @if(!$isSubAdmin)
+                        <li>
+                            <a href="{{ route('admin.bank-sampah.penarikan.index') }}"
+                                class="{{ request()->routeIs('admin.bank-sampah.penarikan.index') ? 'active' : '' }}">
+                                Data Penarikan
+                            </a>
+                            <span class="notif-badge-wrapper" onclick="openNotifModal('penarikan')" title="Lihat notifikasi">
+                                <span id="badge-penarikan" class="notif-badge" style="display:none;">0</span>
+                            </span>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.bank-sampah.jenis-sampah.index') }}"
+                                class="{{ request()->routeIs('admin.bank-sampah.jenis-sampah.index') ? 'active' : '' }}">
+                                Jenis & Harga Sampah
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.bank-sampah.penjemputan.index') }}"
+                                class="{{ request()->routeIs('admin.bank-sampah.penjemputan*') ? 'active' : '' }}">
+                                Penjemputan
+                            </a>
+                            <span class="notif-badge-wrapper"
+                                onclick="openNotifModal('penjemputan'); event.stopPropagation(); return false;"
+                                title="Lihat notifikasi">
+                                <span id="badge-penjemputan" class="notif-badge" style="display:none;">0</span>
+                            </span>
+                        </li>
+                    @endif
                     <li>
                         <a href="{{ route('admin.bank-sampah.b3.pendaftaran.index') }}"
                             class="{{ request()->routeIs('admin.bank-sampah.b3*') ? 'active' : '' }}">

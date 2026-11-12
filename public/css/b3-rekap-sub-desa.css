@@ -1,0 +1,17 @@
+/* CSS desain "Sub Desa - Rekap"
+   Semua class diawali sdr- supaya tidak bentrok dengan css B3 lain */
+.sdr-actions{display:flex;justify-content:flex-end;gap:12px;margin:18px 0 14px;flex-wrap:wrap}
+.sdr-btn{border:none;background:#4fa574;color:#1b2e22;height:40px;padding:0 22px;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit}
+.sdr-btn:hover{background:#44936a}
+
+.sdr-table-wrap{border:1px solid #3a3a3a;border-radius:10px;overflow:hidden}
+.sdr-table{width:100%;border-collapse:collapse}
+.sdr-table th{background:#4fa574;color:#1b2e22;text-align:left;padding:14px 16px;font-size:14px;font-weight:400}
+.sdr-table td{background:#c4c4c4;color:#222;padding:12px 16px;font-size:12px}
+.sdr-table .sdr-tengah{text-align:center}
+
+.sdr-box{background:#fff;border:1px solid #d0d0d0;border-radius:8px;padding:10px 12px;margin-top:14px;font-size:11px;color:#222}
+.sdr-muted{color:#555}
+
+.sdr-toast{position:fixed;bottom:20px;right:20px;background:#4fa574;color:#1b2e22;padding:12px 18px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.3s;z-index:1100}
+.sdr-toast.show{opacity:1;transform:none}
