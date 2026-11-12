@@ -1,6 +1,6 @@
 {{-- Tab Rekap: tampilan saja, data contoh. Backend nanti bisa kirim $rsItems dan $rsRiwayat --}}
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/b3-rekap-serah-terima.css?v=' . time()) }}">
+    <link rel="stylesheet" href="{{ asset('css/b3-rekap.css?v=' . time()) }}">
 @endpush
 
 @php
@@ -13,39 +13,38 @@
     $rsTampilDesa = $q === '' || str_contains('payaman', $q) || str_contains('per desa', $q);
 @endphp
 
-<div class="rs-actions">
-    <button type="button" class="rs-btn rs-btn--hijau" id="rs-btnExport">Export Excel</button>
-    <button type="button" class="rs-btn rs-btn--hijau" id="rs-btnOpen">Catat Serah Terima</button>
+<div class="rekap-actions">
+    <button type="button" class="rekap-btn" id="rs-btnExport">Export Excel</button>
+    <button type="button" class="rekap-btn" id="rs-btnOpen">Catat Serah Terima</button>
 </div>
 
-<table class="rs-table">
+<table class="rekap-table">
     <thead>
-        <tr><th>Jenis B3</th><th>Jumlah</th><th class="rs-kanan">Nilai Saldo</th></tr>
+        <tr><th>Jenis B3</th><th>Jumlah</th><th class="rekap-kanan">Nilai Saldo</th></tr>
     </thead>
     <tbody>
         @forelse ($rsBaris as $i)
             <tr>
                 <td>{{ $i['jenis'] }}</td>
                 <td>{{ $i['jumlah'] }} item</td>
-                <td class="rs-kanan">Rp {{ number_format($i['nilai'], 0, ',', '.') }}</td>
+                <td class="rekap-kanan">Rp {{ number_format($i['nilai'], 0, ',', '.') }}</td>
             </tr>
         @empty
-            <tr><td colspan="3" class="rs-muted">Data tidak ditemukan.</td></tr>
+            <tr><td colspan="3" class="rekap-muted">Data tidak ditemukan.</td></tr>
         @endforelse
     </tbody>
 </table>
 
 @if ($rsTampilDesa)
-    <div class="rs-box">Per desa: Payaman 1 warga</div>
+    <div class="rekap-box">Per desa: Payaman 1 warga</div>
 @endif
 
-<div class="rs-box">
+<div class="rekap-box">
     <h3>Riwayat serah terima</h3>
-    <div id="rs-riwayat"></div>
+    <div id="rekap-riwayat"></div>
 </div>
 
 @include('admin.bank-sampah.B3.Modals.Serah-Terima')
-<div class="rs-toast" id="rs-toast"></div>
 
 @push('scripts')
 <script>
@@ -57,9 +56,9 @@
     const $ = id => document.getElementById(id);
 
     function renderRiwayat() {
-        $('rs-riwayat').innerHTML = riwayat.length
+        $('rekap-riwayat').innerHTML = riwayat.length
             ? riwayat.map(r => `<p>${r.tgl}: ${r.jumlah} item ke ${r.tujuan}, penerima ${r.penerima}</p>`).join('')
-            : '<p class="rs-muted">Belum ada riwayat.</p>';
+            : '<p class="rekap-muted">Belum ada riwayat.</p>';
     }
     function toast(msg) {
         const t = $('rs-toast'); t.textContent = msg; t.classList.add('show');
