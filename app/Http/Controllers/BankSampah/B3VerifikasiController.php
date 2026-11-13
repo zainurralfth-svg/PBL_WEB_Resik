@@ -190,7 +190,7 @@ class B3VerifikasiController extends Controller
             abort(403, 'Pendaftaran ini bukan di desa Anda.');
         }
 
-                $alasan = trim((string) $request->input('alasan', ''));
+        $alasan = trim((string) $request->input('alasan', ''));
 
         $pendaftaran->update([
             'status' => B3Pendaftaran::MENUNGGU_VERIFIKASI,
@@ -217,4 +217,3 @@ class B3VerifikasiController extends Controller
         return 1500.0;
     }
 }
-

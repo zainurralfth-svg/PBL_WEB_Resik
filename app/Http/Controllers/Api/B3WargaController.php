@@ -69,8 +69,24 @@ class B3WargaController extends Controller
         $idMasyarakat = (int) $request->query('id_masyarakat');
         $idPns = (int) $request->query('id_pns');
 
+        // Kontrak B3Service (mobile): ?user_id=..&tipe=masyarakat|pns|petugas
+        $userId = (int) $request->query('user_id');
+        if ($userId > 0) {
+            $tipe = $request->query('tipe') ?: 'masyarakat';
+
+            if ($tipe === 'petugas') {
+                return $this->kirim([]); // petugas tidak punya pendaftaran B3
+            }
+
+            if ($tipe === 'pns') {
+                $idPns = $userId;
+            } else {
+                $idMasyarakat = $userId;
+            }
+        }
+
         if ($idMasyarakat <= 0 && $idPns <= 0) {
-            return $this->gagal('id_masyarakat atau id_pns wajib diisi', 422);
+            return $this->gagal('user_id (atau id_masyarakat / id_pns) wajib diisi', 422);
         }
 
         $rows = B3Pendaftaran::with(['periode', 'items'])
@@ -205,14 +221,29 @@ class B3WargaController extends Controller
         $status = $this->statusApi($b);
 
         return [
+            // --- dipakai layar Riwayat B3 ---
             'id'                  => $b->id,
             'tanggal'             => $tgl->toDateString(),
             'periode'             => $tgl->copy()->locale('id')->isoFormat('MMMM'), // "Oktober"
             'jenis'               => $this->jenisText($b),
             'estimasi_berat'      => $this->angka($b->est_berat),
             'berat_terverifikasi' => $this->angka($b->berat_verifikasi),
-            'status'              => $status,
             'alasan'              => $status === 'tidak_sesuai' ? $b->alasan_tidak_sesuai : null,
+
+            // --- dipakai B3Service / "Pendaftaran Saya" (lib/models/B3_model.dart) ---
+            'id_pendaftaran'      => $b->id,
+            'jenis_teks'          => $this->jenisText($b),
+            'estimasi_kg'         => $this->angka($b->est_berat),
+            'berat_verifikasi_kg' => $this->angka($b->berat_verifikasi),
+            'tgl_jemput'          => $tgl->toDateString(),
+            'tgl_verifikasi'      => $b->tgl_verifikasi
+                ? Carbon::parse($b->tgl_verifikasi)->toDateString()
+                : null,
+
+            // Label ("Dijadwalkan", "Tidak sesuai", ...) sesuai kontrak B3Service;
+            // kode lowercase ada di status_kode.
+            'status'              => $this->labelStatus($status),
+            'status_kode'         => $status,
         ];
     }
 
@@ -252,6 +283,17 @@ class B3WargaController extends Controller
         }
 
         return $b->status; // terdaftar | dijadwalkan | menunggu_verifikasi | diverifikasi
+    }
+
+    private function labelStatus(string $kode): string
+    {
+        return [
+            'terdaftar'           => 'Terdaftar',
+            'dijadwalkan'         => 'Dijadwalkan',
+            'menunggu_verifikasi' => 'Menunggu verifikasi',
+            'diverifikasi'        => 'Diverifikasi',
+            'tidak_sesuai'        => 'Tidak sesuai',
+        ][$kode] ?? ucfirst(str_replace('_', ' ', $kode));
     }
 
     /** Tanggal jemput dari periode; jika periode tidak ada, pakai tanggal daftar. */
