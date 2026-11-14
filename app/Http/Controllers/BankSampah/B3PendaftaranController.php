@@ -108,6 +108,7 @@ class B3PendaftaranController extends Controller
             $pendaftaran->update([
                 'id_petugas' => $data['id_petugas'],
                 'status' => B3Pendaftaran::DIJADWALKAN,
+                'tgl_dijadwalkan' => now(),
             ]);
 
             return true;

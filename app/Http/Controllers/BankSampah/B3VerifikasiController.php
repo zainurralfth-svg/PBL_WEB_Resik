@@ -163,6 +163,7 @@ class B3VerifikasiController extends Controller
                 'total_imbalan' => $totalImbalan,
                 'catatan_verifikasi' => $request->input('catatan'),
                 'tgl_verifikasi' => now(),
+                'alasan_tidak_sesuai' => null,
             ]);
 
             return true;
@@ -189,9 +190,14 @@ class B3VerifikasiController extends Controller
             abort(403, 'Pendaftaran ini bukan di desa Anda.');
         }
 
+        $alasan = trim((string) $request->input('alasan', ''));
+
         $pendaftaran->update([
             'status' => B3Pendaftaran::MENUNGGU_VERIFIKASI,
             'catatan_verifikasi' => 'Jumlah fisik dilaporkan tidak sesuai dengan pendaftaran. Menunggu konfirmasi ulang.',
+            'alasan_tidak_sesuai' => $alasan !== ''
+                ? $alasan
+                : 'Jumlah fisik tidak sesuai dengan pendaftaran.',
         ]);
 
         return back()->with('error', 'Data ditandai tidak sesuai. Menunggu tindak lanjut konfirmasi.');
@@ -211,4 +217,3 @@ class B3VerifikasiController extends Controller
         return 1500.0;
     }
 }
-
