@@ -19,7 +19,8 @@ use App\Http\Controllers\Api\RiwayatSetorAdminController;
 use App\Http\Controllers\Api\RiwayatPenjemputanController;
 use App\Http\Controllers\Api\KonfirmasiSetorController;
 use App\Http\Controllers\Api\B3WargaController;
-use App\Http\Controllers\B3PetugasController;
+use App\Http\Controllers\Api\B3PetugasController;
+
 
 // ==================== 🔓 PUBLIC ROUTES (Tanpa Login) ====================
 
@@ -37,14 +38,10 @@ Route::put('/notifications/mark-all-read', [App\Http\Controllers\Api\Notificatio
 
 // B3: periode yang dibuat admin di web (hanya baca, untuk layar Sampah B3 warga)
 Route::get('/b3/periode-aktif', [B3WargaController::class, 'periodeAktif']);
-
-
-// Route khusus Petugas B3
-
-Route::get('/petugas/b3-tasks', [B3PetugasController::class, 'index']);
-Route::get('/petugas/b3-ringkasan', [B3PetugasController::class, 'getRingkasanRute']);
-Route::put('/petugas/b3-tasks/{id}/status', [B3PetugasController::class, 'updateStatus']);
-Route::get('/petugas/b3-rute', [B3PetugasController::class, 'getRuteDesa']);
+Route::get('/b3/riwayat', [B3WargaController::class, 'riwayat']);
+Route::get('/b3/{id}', [B3WargaController::class, 'show'])->whereNumber('id');
+Route::post('/b3', [B3WargaController::class, 'store']);
+Route::get('/petugas/b3-ringkasan', [B3PetugasController::class, 'getRingkasanB3']);
 
 Route::get('/kecamatan', [KecamatanController::class, 'index']);
 Route::get('/desa', [DesaController::class, 'index']); // Support ?kecamatan_id= filter
