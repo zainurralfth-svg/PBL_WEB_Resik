@@ -34,12 +34,22 @@ class B3Pendaftaran extends Model
         'total_imbalan',
         'catatan_verifikasi',
         'tgl_verifikasi',
+        'berat_dijemput',
+        'berat_verifikasi',
+        'tgl_dijadwalkan',
+        'tgl_dijemput',
+        'alasan_tidak_sesuai',
+        'foto_bukti',
     ];
 
     protected $casts = [
         'est_berat' => 'decimal:2',
+        'berat_dijemput' => 'decimal:2',
+        'berat_verifikasi' => 'decimal:2',
         'total_imbalan' => 'decimal:2',
         'tgl_verifikasi' => 'datetime',
+        'tgl_dijadwalkan' => 'datetime',
+        'tgl_dijemput' => 'datetime',
     ];
 
     /** B3Periode dibuat oleh temanmu; relasi ini baru dipakai kalau modelnya sudah ada. */

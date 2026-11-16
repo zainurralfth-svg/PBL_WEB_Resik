@@ -41,7 +41,18 @@ Route::get('/b3/periode-aktif', [B3WargaController::class, 'periodeAktif']);
 Route::get('/b3/riwayat', [B3WargaController::class, 'riwayat']);
 Route::get('/b3/{id}', [B3WargaController::class, 'show'])->whereNumber('id');
 Route::post('/b3', [B3WargaController::class, 'store']);
-Route::get('/petugas/b3-ringkasan', [B3PetugasController::class, 'getRingkasanB3']);
+// B3 petugas (aplikasi petugas): kirim id_petugas lewat query / body
+Route::prefix('petugas')->group(function () {
+    Route::get('/b3-ringkasan', [B3PetugasController::class, 'getRingkasanB3']);
+    Route::get('/b3-rute', [B3PetugasController::class, 'getRuteDesa']);
+    Route::get('/b3-tasks', [B3PetugasController::class, 'index']);
+    Route::put('/b3-tasks/{id}/status', [B3PetugasController::class, 'updateStatus'])->whereNumber('id');
+    // POST = alias untuk upload foto (multipart); PHP tidak membaca multipart pada PUT
+    Route::post('/b3-tasks/{id}/status', [B3PetugasController::class, 'updateStatus'])->whereNumber('id');
+    Route::get('/b3-riwayat', [B3PetugasController::class, 'riwayat']);
+    Route::get('/b3-muatan', [B3PetugasController::class, 'getMuatan']);
+    Route::post('/b3-rute/selesai', [B3PetugasController::class, 'selesaikanRute']);
+});
 
 Route::get('/kecamatan', [KecamatanController::class, 'index']);
 Route::get('/desa', [DesaController::class, 'index']); // Support ?kecamatan_id= filter
