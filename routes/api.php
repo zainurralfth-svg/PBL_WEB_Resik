@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\RiwayatSetorAdminController;
 use App\Http\Controllers\Api\RiwayatPenjemputanController;
 use App\Http\Controllers\Api\KonfirmasiSetorController;
 use App\Http\Controllers\Api\B3WargaController;
+use App\Http\Controllers\Api\B3PetugasController;
 
 
 // ==================== 🔓 PUBLIC ROUTES (Tanpa Login) ====================

@@ -43,6 +43,8 @@ class B3Pendaftaran extends Model
 
     protected $casts = [
         'est_berat' => 'decimal:2',
+        'berat_dijemput' => 'decimal:2',
+        'berat_verifikasi' => 'decimal:2',
         'total_imbalan' => 'decimal:2',
         'tgl_verifikasi' => 'datetime',
         'berat_dijemput' => 'decimal:2',
