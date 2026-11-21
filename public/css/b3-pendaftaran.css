@@ -1,16 +1,17 @@
 /* B3 - gaya khusus tab PENDAFTARAN: filter, tabel, pill status, dialog Tugaskan. */
 .b3-tablewrap{overflow-x:auto;border:1px solid #333;border-radius:10px}
 .b3-table{width:100%;min-width:780px;border-collapse:collapse;table-layout:fixed}
-.b3-table thead th{padding:15px 14px;text-align:left;font-size:.92rem;font-weight:500;color:#1c1c1c;background:#4fa676;height:50px}
-.b3-table tbody td{padding:0 14px;height:53px;font-size:.78rem;background:#c4c4c4;border-top:1.5px solid #444;vertical-align:middle}
+.b3-table thead th{padding:15px 14px;text-align:left;font-size:.92rem;font-weight:500;color:#fff;background:#4fa676;height:50px}
+.b3-table tbody td{padding:0 14px;height:53px;font-size:.78rem;background:#d9d9d9;border-top:1.5px solid #444;vertical-align:middle}
 .b3-table th:nth-child(1){width:18%}.b3-table th:nth-child(2){width:11%}.b3-table th:nth-child(3){width:28%}
 .b3-table th:nth-child(4){width:10%}.b3-table th:nth-child(5){width:17%}.b3-table th:nth-child(6){width:16%}
 .b3-table th:nth-child(5),.b3-table td:nth-child(5){text-align:center}
 .b3-filter{margin:6px 0 26px 11px}
-.b3-select{width:110px;padding:3px 8px;font-size:1rem;color:#222;background:#f2f2f2;border:1.5px solid #333;border-radius:6px;cursor:pointer}
+.b3-filter--bar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:6px 0 14px}
+.b3-select{min-width:110px;padding:5px 10px;font-size:.82rem;color:#222;background:#f2f2f2;border:1.5px solid #333;border-radius:6px;cursor:pointer}
 .b3-select:focus-visible{outline:3px solid #2e8b57;outline-offset:2px}
 .b3-pill{display:inline-block;min-width:96px;padding:2px 14px;font-size:.75rem;text-align:center;border-radius:999px;white-space:nowrap}
-.b3-pill--terdaftar{background:transparent;border:1px solid #222}
+.b3-pill--terdaftar{background:#fff;border:1px solid #222}
 .b3-pill--dijadwalkan{background:#139a24;border:1px solid #0e7a1c;color:#fff}
 .b3-pill--menunggu_verifikasi{background:#fbeeb0;border:1px solid #b8a64a}
 .b3-pill--diverifikasi{background:#8fdc9b;border:1px solid #2e9d45}
@@ -30,3 +31,15 @@
 .b3-btn--primer{color:#fff;background:#2e8b57}
 .b3-btn--sekunder{color:#2e8b57;background:#fff}
 .b3-btn:focus-visible{outline:3px solid #1b5e32;outline-offset:2px}
+.b3-pill--tidak_sesuai{background:#f4c7c3;border:1px solid #c0392b;color:#7a1f16}
+.b3-pill--tidak_ada_di_tempat{background:#fde0de;border:1px solid #d9534f;color:#8a1f1a}
+.b3-tugaskan-semua{margin-left:auto;padding:6px 14px;font:inherit;font-size:.78rem;color:#222;background:#fff;border:1px solid #333;border-radius:6px;cursor:pointer}
+.b3-tugaskan-semua:hover{background:#f1f1f1}
+.b3-tugaskan-semua:focus-visible{outline:3px solid #2e8b57;outline-offset:2px}
+.b3-info{margin-top:14px;padding:10px 14px;border-radius:8px;font-size:.78rem;line-height:1.5;background:#fbf0c4;color:#5a4a00}
+.b3-info--hijau{background:#dff3e5;color:#1b5e32}
+.b3-toast{position:fixed;right:20px;bottom:20px;z-index:1200;max-width:320px;padding:11px 16px;font-size:.85rem;color:#fff;background:#2e8b57;border-radius:10px;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none}
+.b3-toast.show{opacity:1;transform:none}
+.b3-dialog{background:#fff}
+.b3-dialog__catatan{margin:10px 0 0;font-size:.72rem;color:#666;line-height:1.45}
+.b3-dialog p strong{color:#222}

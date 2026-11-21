@@ -48,11 +48,6 @@ class RiwayatPenjemputanController extends Controller
 
     private function getUrlFoto($path)
     {
-        if (app()->environment('production')) {
-            // Hosting: pakai folder uploads
-            return asset('uploads/' . $path);
-        }
-        // Local: pakai storage link
-        return asset('storage/' . $path);
+        return self::uploadUrl($path);
     }
 }

@@ -60,7 +60,7 @@
     padding: 24px 28px;
     border: 0;
     border-radius: 14px;
-    background: #e8ece9;
+    background: #fff;
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
 }
 
@@ -161,3 +161,38 @@
     background-color: #246d44;
 }
 
+
+/* Tombol Verifikasi nonaktif (status belum Menunggu verifikasi) */
+.b3-btn-verifikasi--off { background-color: #d4d4d4; color: #fff; cursor: not-allowed; }
+.b3-btn-verifikasi--off:hover { background-color: #d4d4d4; }
+
+/* Foto bukti petugas */
+.b3-foto { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.b3-foto__img { width: 84px; height: 62px; border-radius: 8px; object-fit: cover; background: #b9d0bd; }
+.b3-foto__info { font-size: 0.72rem; color: #555; line-height: 1.5; }
+.b3-foto__info a { color: #2e8b57; }
+.b3-modal-label { display: block; margin-bottom: 6px; font-size: 0.82rem; color: #2d2d2d; font-weight: 500; }
+.b3-modal-label small { font-weight: 400; color: #666; }
+.b3-modal-verifikasi textarea,
+.b3-modal-ts textarea {
+    width: 100%; padding: 9px 12px; font: inherit; font-size: 0.88rem; background: #fdfdfd;
+    border: 1px solid #b8bec2; border-radius: 8px; box-sizing: border-box; resize: vertical;
+}
+
+/* Kotak nilai saldo */
+.b3-saldo { padding: 10px 14px; font-size: 0.8rem; color: #1b5e32; background: #dff3e5; border: 1px solid #b7e0c3; border-radius: 8px; line-height: 1.5; }
+.b3-saldo strong { font-weight: 600; }
+
+/* Modal Tandai Tidak Sesuai */
+.b3-modal-ts { margin: auto; width: min(400px, 94vw); padding: 22px 24px; border: 0; border-radius: 14px; background: #fff; box-shadow: 0 12px 35px rgba(0,0,0,.25); }
+.b3-modal-ts::backdrop { background: rgba(0,0,0,.45); }
+.b3-modal-ts h2 { margin: 0 0 4px; font-size: 1.1rem; font-weight: 600; color: #c0392b; }
+.b3-modal-ts p { margin: 0 0 12px; font-size: 0.78rem; color: #555; line-height: 1.45; }
+.b3-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.b3-chip { padding: 5px 12px; font: inherit; font-size: 0.78rem; color: #333; background: #ececec; border: 1px solid #cfcfcf; border-radius: 999px; cursor: pointer; }
+.b3-chip.is-on { color: #fff; background: #2e8b57; border-color: #2e8b57; }
+.b3-chip:focus-visible { outline: 2px solid #1b5e32; outline-offset: 2px; }
+.b3-ts-err { display: none; margin: 6px 0 0; font-size: 0.75rem; color: #c0392b; }
+.b3-ts-note { margin: 10px 0 0 !important; font-size: 0.7rem !important; color: #666 !important; }
+.b3-modal-ts__aksi { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+.b3-btn-batal { padding: 8px 16px; font: inherit; font-size: 0.82rem; color: #222; background: #fff; border: 1px solid #999; border-radius: 8px; cursor: pointer; }

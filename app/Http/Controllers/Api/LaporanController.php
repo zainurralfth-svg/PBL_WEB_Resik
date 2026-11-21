@@ -62,15 +62,7 @@ class LaporanController extends Controller
 
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-                if (app()->environment('production')) {
-
-                    // Folder public_html/uploads/laporan
-                    $destination = dirname(base_path()) . '/public_html/uploads/laporan';
-                } else {
-
-                    // Local XAMPP
-                    $destination = storage_path('app/public/laporan');
-                }
+                $destination = $this->uploadDir('laporan');
 
                 // Buat folder jika belum ada
                 if (!file_exists($destination)) {
@@ -203,11 +195,7 @@ class LaporanController extends Controller
             return $path;
         }
 
-        if (app()->environment('production')) {
-            return asset('uploads/' . $path);
-        }
-
-        return asset('storage/' . $path);
+        return self::uploadUrl($path);
     }
 
     /**

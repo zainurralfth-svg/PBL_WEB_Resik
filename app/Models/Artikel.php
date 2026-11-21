@@ -31,9 +31,6 @@ class Artikel extends Model
     {
         if (!$this->foto) return null;
         
-        if (app()->environment('production')) {
-            return asset('uploads/' . $this->foto);
-        }
-        return asset('storage/' . $this->foto);
+        return \App\Http\Controllers\Controller::uploadUrl($this->foto);
     }
 }

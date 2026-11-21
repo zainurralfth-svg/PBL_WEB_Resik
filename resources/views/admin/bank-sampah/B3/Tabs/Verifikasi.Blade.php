@@ -6,6 +6,26 @@
     </div>
 @endif
 
+{{-- Filter periode + desa --}}
+@php $periodeList = $periodes ?? collect(); @endphp
+<form method="GET" action="{{ route('admin.bank-sampah.b3.verifikasi.index') }}" class="b3-filter b3-filter--bar">
+    @if (request('q')) <input type="hidden" name="q" value="{{ request('q') }}"> @endif
+    <select name="periode_id" class="b3-select" aria-label="Filter periode" onchange="this.form.submit()">
+        <option value="">Semua periode</option>
+        @foreach ($periodeList as $p)
+            <option value="{{ $p->id_periode }}" @selected(request('periode_id') == $p->id_periode)>
+                Periode {{ isset($p->tgl_jemput) ? $p->tgl_jemput->locale('id')->translatedFormat('M Y') : '#' . $p->id_periode }}
+            </option>
+        @endforeach
+    </select>
+    <select name="desa_id" class="b3-select" aria-label="Filter desa" onchange="this.form.submit()">
+        <option value="">Semua desa</option>
+        @foreach (($desas ?? []) as $desa)
+            <option value="{{ $desa->id_desa }}" @selected(request('desa_id') == $desa->id_desa)>{{ $desa->nama_desa }}</option>
+        @endforeach
+    </select>
+</form>
+
 {{-- Tabel Verifikasi B3 --}}
 <div class="b3-tablewrap">
     <table class="b3-table b3-table--verifikasi">
@@ -34,6 +54,10 @@
                     <td>
                         @if ($row->status === \App\Models\B3Pendaftaran::DIVERIFIKASI)
                             <span class="b3-nominal-aksi">{{ $row->total_imbalan_label }}</span>
+                        @elseif ($row->status === 'dijadwalkan')
+                            <span class="b3-btn-verifikasi b3-btn-verifikasi--off" aria-disabled="true">Verifikasi</span>
+                        @elseif ($row->status !== 'menunggu_verifikasi')
+                            -
                         @else
                             @php
                                 $payloadItems = $row->items->map(function ($it) {
@@ -43,14 +67,18 @@
                                         'jumlah_didaftarkan' => $it->jumlah,
                                         'jumlah_petugas' => $it->jumlah_petugas ?? $it->jumlah,
                                         'jumlah_verifikasi' => $it->jumlah_verifikasi ?? $it->jumlah_petugas ?? $it->jumlah,
+                                        'tarif' => ($it->harga_satuan ?? 0) > 0 ? (float) $it->harga_satuan : null,
                                     ];
                                 });
                             @endphp
                             <button type="button" class="b3-btn-verifikasi"
                                 data-action="{{ route('admin.bank-sampah.b3.verifikasi.simpan', $row->id) }}"
                                 data-action-tidak-sesuai="{{ route('admin.bank-sampah.b3.verifikasi.tidak-sesuai', $row->id) }}"
+                                data-nama="{{ $row->nama_pendaftar }}"
                                 data-desa="{{ $row->nama_desa }}"
                                 data-petugas="{{ $row->petugas_nama }}"
+                                data-foto="{{ $row->foto_bukti ? asset('uploads/' . $row->foto_bukti) : '' }}"
+                                data-foto-ket="Foto bukti petugas"
                                 data-items="{{ json_encode($payloadItems) }}">
                                 Verifikasi
                             </button>
@@ -68,6 +96,11 @@
     </table>
 </div>
 
+<div class="b3-info b3-info--hijau">
+    Tombol <strong>Verifikasi</strong> aktif setelah petugas menandai <strong>Dijemput</strong> di aplikasi
+    (status <em>Menunggu verifikasi</em>). Yang bertanda <em>Tidak ada di tempat</em> tidak diverifikasi.
+</div>
+
 @if (isset($verifikasis) && method_exists($verifikasis, 'hasPages') && $verifikasis->hasPages())
     <div class="b3-pager">{{ $verifikasis->links() }}</div>
 @endif
@@ -77,4 +110,3 @@
 @push('scripts')
     <script src="{{ asset('js/b3-verifikasi.js?v=' . time()) }}"></script>
 @endpush
-

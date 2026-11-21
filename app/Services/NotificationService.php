@@ -9,11 +9,17 @@ use Illuminate\Support\Facades\Log;
 
 class NotificationService
 {
-    protected FirebaseService $firebase;
+    protected ?FirebaseService $firebase = null;
 
     public function __construct()
     {
-        $this->firebase = new FirebaseService();
+        try {
+            $this->firebase = new FirebaseService();
+        } catch (\RuntimeException $e) {
+            Log::warning('Firebase tidak tersedia; notifikasi push dinonaktifkan.', [
+                'exception' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -50,6 +56,10 @@ class NotificationService
         array $data,
         ?int $idDesa = null
     ): void {
+
+        if (!$this->firebase) {
+            return;
+        }
 
         $tokens = $this->getAdminTokens($idDesa);
 
@@ -247,6 +257,11 @@ class NotificationService
     // ✅ KIRIM FCM
     if (!$token) {
         \Log::warning('FCM Token kosong, skip FCM');
+        return;
+    }
+
+    if (!$this->firebase) {
+        \Log::warning('FCM dilewati karena kredensial Firebase tidak tersedia.');
         return;
     }
 

@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\RiwayatSetorAdminController;
 use App\Http\Controllers\Api\RiwayatPenjemputanController;
 use App\Http\Controllers\Api\KonfirmasiSetorController;
 use App\Http\Controllers\Api\B3WargaController;
+use App\Http\Controllers\Api\B3PetugasController;
 
 
 // ==================== 🔓 PUBLIC ROUTES (Tanpa Login) ====================
@@ -43,6 +44,18 @@ Route::post('/b3', [B3WargaController::class, 'store']);
 
 Route::get('/kecamatan', [KecamatanController::class, 'index']);
 Route::get('/desa', [DesaController::class, 'index']); // Support ?kecamatan_id= filter
+
+Route::prefix('petugas')->group(function () {
+    Route::get('/b3-ringkasan', [B3PetugasController::class, 'getRingkasanB3']);
+    Route::get('/b3-rute', [B3PetugasController::class, 'getRuteDesa']);
+    Route::get('/b3-tasks', [B3PetugasController::class, 'index']);
+    Route::put('/b3-tasks/{id}/status', [B3PetugasController::class, 'updateStatus'])->whereNumber('id');
+    Route::post('/b3-tasks/{id}/status', [B3PetugasController::class, 'updateStatus'])->whereNumber('id');
+    Route::post('/b3-tasks/{id}/tidak-ada', [B3PetugasController::class, 'tidakAda'])->whereNumber('id');
+    Route::get('/b3-riwayat', [B3PetugasController::class, 'riwayat']);
+    Route::get('/b3-muatan', [B3PetugasController::class, 'getMuatan']);
+    Route::post('/b3-rute/selesai', [B3PetugasController::class, 'selesaikanRute']);
+});
 
 // Auth - Forgot Password Flow
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);

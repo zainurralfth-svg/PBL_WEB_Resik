@@ -52,15 +52,13 @@
                         <tr>
                             <td>{{ $jenisSampah->firstItem() + $key }}</td>
                             <td>
-                                @if ($item->gambar)
-                                    @php
-                                        $disk = app()->environment('production') ? 'uploads' : 'storage';
-                                    @endphp
-                                    <img src="{{ asset($disk . '/' . $item->gambar) }}" alt="{{ $item->jenis }}"
-                                        class="table-img" onerror="this.src='{{ asset('images/default-sampah.jpg') }}'">
-                                @else
+                               @if ($item->gambar)
+                                    <img src="{{ asset('uploads/' . ltrim(preg_replace('#^(storage|uploads)/#', '', $item->gambar), '/')) }}"
+                                        alt="{{ $item->jenis }}" class="table-img"
+                                        onerror="this.onerror=null;this.style.visibility='hidden'">
+                               @else
                                     <span class="text-muted">-</span>
-                                @endif
+                               @endif
                             </td>
                             <td>{{ $item->jenis }}</td>
                             <td>{{ $item->satuan }}</td>
