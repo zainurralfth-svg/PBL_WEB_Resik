@@ -13,12 +13,23 @@ class B3Pendaftaran extends Model
     public const DIJADWALKAN = 'dijadwalkan';
     public const MENUNGGU_VERIFIKASI = 'menunggu_verifikasi';
     public const DIVERIFIKASI = 'diverifikasi';
+    public const TIDAK_ADA_DI_TEMPAT = 'tidak_ada_di_tempat';
+    public const TIDAK_SESUAI = 'tidak_sesuai';
 
     public const STATUS_LABEL = [
         self::TERDAFTAR => 'Terdaftar',
         self::DIJADWALKAN => 'Dijadwalkan',
         self::MENUNGGU_VERIFIKASI => 'Menunggu verifikasi',
         self::DIVERIFIKASI => 'Diverifikasi',
+        self::TIDAK_ADA_DI_TEMPAT => 'Tidak ada di tempat',
+        self::TIDAK_SESUAI => 'Tidak sesuai',
+    ];
+
+    public const ALASAN_TIDAK_ADA = [
+        'rumah_kosong' => 'Rumah kosong',
+        'tidak_bisa_dihubungi' => 'Warga tidak bisa dihubungi',
+        'b3_belum_disiapkan' => 'B3 belum disiapkan / tidak ada di lokasi',
+        'lainnya' => 'Lainnya',
     ];
 
     protected $table = 'b3_pendaftarans';
@@ -39,6 +50,10 @@ class B3Pendaftaran extends Model
         'tgl_dijadwalkan',
         'tgl_dijemput',
         'alasan_tidak_sesuai',
+        'foto_bukti',
+        'alasan_tidak_ada',
+        'catatan_tidakada',
+        'tgl_tidakada',
     ];
 
     protected $casts = [
@@ -51,12 +66,22 @@ class B3Pendaftaran extends Model
         'berat_verifikasi' => 'decimal:2',
         'tgl_dijadwalkan' => 'datetime',
         'tgl_dijemput' => 'datetime',
+        'tgl_tidakada' => 'datetime',
     ];
 
     /** B3Periode dibuat oleh temanmu; relasi ini baru dipakai kalau modelnya sudah ada. */
     public function periode(): BelongsTo
     {
         return $this->belongsTo(B3Periode::class, 'id_periode');
+    }
+
+    /** "Rumah kosong" dari kode alasan_tidak_ada; null jika bukan status tidak ada di tempat. */
+    public function getAlasanTidakAdaLabelAttribute(): ?string
+    {
+        if (! $this->alasan_tidak_ada) {
+            return null;
+        }
+        return self::ALASAN_TIDAK_ADA[$this->alasan_tidak_ada] ?? $this->alasan_tidak_ada;
     }
 
     public function masyarakat(): BelongsTo
@@ -127,7 +152,7 @@ class B3Pendaftaran extends Model
     /** Teks barang yang dibawa petugas di lapangan. Jika masih dijadwalkan, tampil '-' */
     public function getItemsDibawaPetugasTextAttribute(): string
     {
-        if ($this->status === self::DIJADWALKAN || $this->status === self::TERDAFTAR) {
+        if (in_array($this->status, [self::DIJADWALKAN, self::TERDAFTAR, self::TIDAK_ADA_DI_TEMPAT], true)) {
             return '-';
         }
 

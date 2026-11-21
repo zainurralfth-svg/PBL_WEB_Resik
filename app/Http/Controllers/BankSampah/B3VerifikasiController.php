@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\B3Pendaftaran;
 use App\Models\B3PendaftaranItem;
 use App\Models\Desa;
+use App\Models\Masyarakat;
+use App\Models\Pns;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -52,11 +54,13 @@ class B3VerifikasiController extends Controller
         $query = B3Pendaftaran::with(['masyarakat', 'pns', 'desa', 'petugas', 'items'])
             ->untukDesa($desaTerkunci);
 
-        // Hanya tampilkan status yang relevan dengan verifikasi (dijadwalkan, menunggu_verifikasi, diverifikasi)
+        // Status yang relevan dengan verifikasi
         $query->whereIn('status', [
             B3Pendaftaran::DIJADWALKAN,
             B3Pendaftaran::MENUNGGU_VERIFIKASI,
             B3Pendaftaran::DIVERIFIKASI,
+            B3Pendaftaran::TIDAK_SESUAI,
+            B3Pendaftaran::TIDAK_ADA_DI_TEMPAT,
         ]);
 
         if ($request->filled('periode')) {
@@ -79,7 +83,7 @@ class B3VerifikasiController extends Controller
 
         // Urutkan: Menunggu verifikasi & Dijadwalkan lebih awal, kemudian Diverifikasi
         $verifikasis = $query
-            ->orderByRaw("FIELD(status, 'menunggu_verifikasi', 'dijadwalkan', 'diverifikasi')")
+            ->orderByRaw("FIELD(status, 'menunggu_verifikasi', 'dijadwalkan', 'tidak_ada_di_tempat', 'tidak_sesuai', 'diverifikasi')")
             ->orderByDesc('id')
             ->paginate(15)
             ->withQueryString();
@@ -94,7 +98,9 @@ class B3VerifikasiController extends Controller
 
     /**
      * Simpan hasil verifikasi barang B3 dari modal.
-     * Status diubah menjadi 'diverifikasi' dan total imbalan dihitung.
+     * Hanya untuk status 'menunggu_verifikasi'. Status menjadi 'diverifikasi',
+     * total imbalan dihitung (jumlah x harga) dan SALDO warga bertambah.
+     * Semuanya satu transaksi; verifikasi ulang ditolak supaya saldo tidak dobel.
      */
     public function simpan(Request $request, $id)
     {
@@ -108,7 +114,7 @@ class B3VerifikasiController extends Controller
             'catatan' => 'nullable|string|max:500',
         ]);
 
-        $berhasil = DB::transaction(function () use ($id, $request, $admin) {
+        $hasil = DB::transaction(function () use ($id, $request, $admin) {
             /** @var B3Pendaftaran $pendaftaran */
             $pendaftaran = B3Pendaftaran::with('items')->lockForUpdate()->findOrFail($id);
 
@@ -116,45 +122,48 @@ class B3VerifikasiController extends Controller
                 abort(403, 'Pendaftaran ini bukan di desa Anda.');
             }
 
+            if ($pendaftaran->status !== B3Pendaftaran::MENUNGGU_VERIFIKASI) {
+                return ['ok' => false, 'pesan' => 'Hanya data berstatus "Menunggu verifikasi" yang bisa diverifikasi.'];
+            }
+
+            $inputItems = collect($request->input('items', []))->keyBy(fn ($row) => (int) ($row['id'] ?? 0));
             $totalImbalan = 0;
 
-            if ($request->has('items') && is_array($request->items)) {
-                foreach ($request->items as $itemInput) {
-                    $item = $pendaftaran->items->firstWhere('id', (int) ($itemInput['id'] ?? 0));
-                    if (! $item) {
-                        continue;
-                    }
-
-                    $jumlahRiil = (int) ($itemInput['jumlah'] ?? $item->jumlah);
-                    $jenisLower = strtolower(trim($item->jenis_b3));
-
-                    // Tentukan tarif per jenis
-                    $hargaSatuan = $item->harga_satuan > 0 ? (float) $item->harga_satuan : $this->getTarifPerJenis($jenisLower);
-                    $subtotal = $jumlahRiil * $hargaSatuan;
-
-                    $item->update([
-                        'jumlah_verifikasi' => $jumlahRiil,
-                        'jumlah_petugas' => $item->jumlah_petugas ?? $jumlahRiil,
-                        'harga_satuan' => $hargaSatuan,
-                        'subtotal' => $subtotal,
-                    ]);
-
-                    $totalImbalan += $subtotal;
+            foreach ($pendaftaran->items as $item) {
+                if ($inputItems->has($item->id)) {
+                    $jumlahRiil = (int) $inputItems[$item->id]['jumlah'];
+                } else {
+                    $jumlahRiil = (int) ($item->jumlah_verifikasi ?? $item->jumlah_petugas ?? $item->jumlah);
                 }
-            } else {
-                // Jika tidak ada array items spesifik, hitung dari item yang ada
-                foreach ($pendaftaran->items as $item) {
-                    $jumlahRiil = $item->jumlah_verifikasi ?? $item->jumlah_petugas ?? $item->jumlah;
-                    $hargaSatuan = $item->harga_satuan > 0 ? (float) $item->harga_satuan : $this->getTarifPerJenis(strtolower(trim($item->jenis_b3)));
-                    $subtotal = $jumlahRiil * $hargaSatuan;
 
-                    $item->update([
-                        'jumlah_verifikasi' => $jumlahRiil,
-                        'harga_satuan' => $hargaSatuan,
-                        'subtotal' => $subtotal,
-                    ]);
+                $hargaSatuan = $item->harga_satuan > 0
+                    ? (float) $item->harga_satuan
+                    : $this->getTarifPerJenis(strtolower(trim($item->jenis_b3)));
+                $subtotal = $jumlahRiil * $hargaSatuan;
 
-                    $totalImbalan += $subtotal;
+                $item->update([
+                    'jumlah_verifikasi' => $jumlahRiil,
+                    'jumlah_petugas' => $item->jumlah_petugas ?? $jumlahRiil,
+                    'harga_satuan' => $hargaSatuan,
+                    'subtotal' => $subtotal,
+                ]);
+
+                $totalImbalan += $subtotal;
+            }
+
+            // Saldo masuk ke pendaftar (warga atau PNS)
+            if ($totalImbalan > 0) {
+                if ($pendaftaran->id_masyarakat) {
+                    $diubah = Masyarakat::where('id_masyarakat', $pendaftaran->id_masyarakat)->increment('saldo', $totalImbalan);
+                } elseif ($pendaftaran->id_pns) {
+                    $diubah = Pns::where('id_pns', $pendaftaran->id_pns)->increment('saldo', $totalImbalan);
+                } else {
+                    $diubah = 0;
+                }
+
+                if (! $diubah) {
+                    // Batalkan semuanya: lebih baik gagal daripada status berubah tanpa saldo.
+                    throw new \RuntimeException('Pendaftar tidak ditemukan, saldo tidak bisa ditambahkan.');
                 }
             }
 
@@ -166,41 +175,58 @@ class B3VerifikasiController extends Controller
                 'alasan_tidak_sesuai' => null,
             ]);
 
-            return true;
+            return ['ok' => true, 'total' => $totalImbalan];
         });
 
-        if (! $berhasil) {
-            return back()->with('error', 'Gagal memverifikasi data B3.');
+        if (! $hasil['ok']) {
+            return back()->with('error', $hasil['pesan']);
         }
 
-        return back()->with('success', 'Verifikasi berhasil disimpan.');
+        return back()->with('success', 'Verifikasi berhasil disimpan. Saldo warga bertambah Rp ' . number_format($hasil['total'], 0, ',', '.') . '.');
     }
 
     /**
-     * Tandai data penjemputan B3 tidak sesuai dengan kondisi riil di lapangan.
+     * Tandai data penjemputan B3 tidak sesuai. Status menjadi 'tidak_sesuai'
+     * (akhir): tidak ada saldo, warga melihat alasannya. Alasan wajib diisi.
      */
     public function tidakSesuai(Request $request, $id)
     {
         /** @var \App\Models\Admin|null $admin */
         $admin = Auth::guard('admin')->user();
 
-        $pendaftaran = B3Pendaftaran::findOrFail($id);
-
-        if ($admin && method_exists($admin, 'isSubAdminDesa') && $admin->isSubAdminDesa() && $admin->id_desa && $pendaftaran->id_desa != $admin->id_desa) {
-            abort(403, 'Pendaftaran ini bukan di desa Anda.');
-        }
-
-        $alasan = trim((string) $request->input('alasan', ''));
-
-        $pendaftaran->update([
-            'status' => B3Pendaftaran::MENUNGGU_VERIFIKASI,
-            'catatan_verifikasi' => 'Jumlah fisik dilaporkan tidak sesuai dengan pendaftaran. Menunggu konfirmasi ulang.',
-            'alasan_tidak_sesuai' => $alasan !== ''
-                ? $alasan
-                : 'Jumlah fisik tidak sesuai dengan pendaftaran.',
+        $request->validate([
+            'alasan' => 'required|string|max:500',
+        ], [
+            'alasan.required' => 'Alasan wajib diisi untuk menandai Tidak sesuai.',
         ]);
 
-        return back()->with('error', 'Data ditandai tidak sesuai. Menunggu tindak lanjut konfirmasi.');
+        $hasil = DB::transaction(function () use ($id, $request, $admin) {
+            $pendaftaran = B3Pendaftaran::lockForUpdate()->findOrFail($id);
+
+            if ($admin && method_exists($admin, 'isSubAdminDesa') && $admin->isSubAdminDesa() && $admin->id_desa && $pendaftaran->id_desa != $admin->id_desa) {
+                abort(403, 'Pendaftaran ini bukan di desa Anda.');
+            }
+
+            if ($pendaftaran->status !== B3Pendaftaran::MENUNGGU_VERIFIKASI) {
+                return ['ok' => false, 'pesan' => 'Hanya data berstatus "Menunggu verifikasi" yang bisa ditandai Tidak sesuai.'];
+            }
+
+            $pendaftaran->update([
+                'status' => B3Pendaftaran::TIDAK_SESUAI,
+                'total_imbalan' => 0,
+                'catatan_verifikasi' => null,
+                'alasan_tidak_sesuai' => trim((string) $request->input('alasan')),
+                'tgl_verifikasi' => now(),
+            ]);
+
+            return ['ok' => true];
+        });
+
+        if (! $hasil['ok']) {
+            return back()->with('error', $hasil['pesan']);
+        }
+
+        return back()->with('success', 'Data ditandai Tidak sesuai. Warga akan melihat alasannya.');
     }
 
     /**

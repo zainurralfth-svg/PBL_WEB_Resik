@@ -65,7 +65,7 @@ class ProfileController extends Controller
                 // hapus foto lama
                 if ($user->foto) {
 
-                    $oldFile = base_path('../public_html/uploads/profile/' . basename($user->foto));
+                    $oldFile = $this->uploadDir('profile/' . basename($user->foto));
 
                     if (file_exists($oldFile) && is_file($oldFile)) {
                         unlink($oldFile);
@@ -76,7 +76,7 @@ class ProfileController extends Controller
 
                 $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-                $destination = base_path('../public_html/uploads/profile');
+                $destination = $this->uploadDir('profile');
 
                 if (!file_exists($destination)) {
                     mkdir($destination, 0755, true);

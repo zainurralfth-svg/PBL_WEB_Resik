@@ -155,10 +155,7 @@ class PenjemputanController extends Controller
 
     private function getUrlFoto($path)
     {
-        if (app()->environment('production')) {
-            return asset('uploads/' . $path);
-        }
-        return asset('storage/' . $path);
+        return self::uploadUrl($path);
     }
 
 
@@ -281,25 +278,13 @@ class PenjemputanController extends Controller
             $file = $request->file('foto');
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-            if (app()->environment('production')) {
+            $destination = $this->uploadDir('penjemputan');
 
-                $destination = public_path('../uploads/penjemputan');
-
-                if (!file_exists($destination)) {
-                    mkdir($destination, 0755, true);
-                }
-
-                $file->move($destination, $fileName);
-            } else {
-
-                $destination = storage_path('app/public/penjemputan');
-
-                if (!file_exists($destination)) {
-                    mkdir($destination, 0755, true);
-                }
-
-                $file->move($destination, $fileName);
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
             }
+
+            $file->move($destination, $fileName);
 
             $data['foto'] = 'penjemputan/' . $fileName;
         }
