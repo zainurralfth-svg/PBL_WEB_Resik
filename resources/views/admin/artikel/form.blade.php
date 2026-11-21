@@ -44,13 +44,7 @@
                         </div>
                         {{-- FUNGSI: Preview gambar yang tampil setelah file dipilih atau saat mode edit --}}
                         <div class="upload-preview {{ isset($artikel) && $artikel->foto ? 'show' : '' }}"
-                            id="uploadPreview">
-                            @php
-                                $disk = app()->environment('production') ? 'uploads' : 'storage';
-                            @endphp
-                            <img id="previewImage"
-                                src="{{ isset($artikel) && $artikel->foto ? asset($disk . '/' . $artikel->foto) : '' }}"
-                                alt="Preview foto artikel" onerror="this.src='{{ asset('images/default-artikel.jpg') }}'">
+                           src="{{ isset($artikel) && $artikel->foto ? asset('uploads/' . ltrim(preg_replace('#^(storage|uploads)/#', '', $artikel->foto), '/')) : '' }}"
                             {{-- FUNGSI: Tombol untuk menghapus gambar yang sudah dipilih --}}
                             <button type="button" class="remove-image" onclick="removeImage()"
                                 title="Hapus gambar">×</button>
@@ -134,10 +128,7 @@
                 errors: @json($errors->all()),
             @endif
             @if (isset($artikel) && $artikel->foto)
-                @php
-                    $disk = app()->environment('production') ? 'uploads' : 'storage';
-                @endphp
-                existingFoto: "{{ asset($disk . '/' . $artikel->foto) }}",
+                existingFoto: "{{ asset('uploads/' . ltrim(preg_replace('#^(storage|uploads)/#', '', $artikel->foto), '/')) }}",
             @endif
         };
     </script>

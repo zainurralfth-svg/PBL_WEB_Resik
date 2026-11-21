@@ -49,17 +49,12 @@
                 @forelse($artikelList as $index => $artikel)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                                      <td>
+                    <td>
                         @if($artikel->foto)
-                        @php
-                            $disk = app()->environment('production') ? 'uploads' : 'storage';
-                        @endphp
-                        <img src="{{ asset($disk . '/' . $artikel->foto) }}" 
-                            alt="{{ $artikel->judul }}" 
+                        <img src="{{ asset('uploads/' . ltrim(preg_replace('#^(storage|uploads)/#', '', $artikel->foto), '/')) }}"
+                            alt="{{ $artikel->judul }}"
                             class="table-img"
-                            onerror="this.src='{{ asset('images/default-artikel.jpg') }}'">
-                        @else
-                            <span class="text-muted">-</span>
+                            onerror="this.onerror=null;this.style.visibility='hidden'">
                         @endif
                     </td>
                     <td>{{ Str::limit($artikel->judul, 70) }}</td>
