@@ -41,7 +41,7 @@
                     <div id="image-preview" style="margin-top: 15px; text-align: center; position: relative;">
                         @if ($jenisSampah->gambar)
                             @php
-                                $disk = app()->environment('production') ? 'uploads' : 'storage';
+                                $gambarUrl = asset('uploads/' . ltrim(preg_replace('#^(storage|uploads)/#', '', $jenisSampah->gambar), '/'));
                                 $gambarUrl = asset($disk . '/' . $jenisSampah->gambar);
                             @endphp
                             <div style="display: inline-block; position: relative;">

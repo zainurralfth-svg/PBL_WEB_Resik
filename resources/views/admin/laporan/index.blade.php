@@ -54,22 +54,14 @@
 
                             // Handle foto laporan dari mobile app
                             if ($foto) {
-                                if (app()->environment('production')) {
-                                    $fotoUrl = asset('uploads/' . $foto);
-                                } else {
-                                    $fotoUrl = asset('storage/' . $foto);
-                                }
+                                $fotoUrl = asset('uploads/' . ltrim(preg_replace('#^(storage|uploads)/#', '', $foto), '/'));
                             } else {
                                 $fotoUrl = 'https://via.placeholder.com/300x200?text=Tidak+Ada+Foto';
                             }
 
                             // Handle foto balasan
                             if ($fotoBalasan) {
-                                if (app()->environment('production')) {
-                                    $fotoBalasanUrl = asset('uploads/' . $fotoBalasan);
-                                } else {
-                                    $fotoBalasanUrl = asset('storage/' . $fotoBalasan);
-                                }
+                                $fotoBalasanUrl = asset('uploads/' . ltrim(preg_replace('#^(storage|uploads)/#', '', $fotoBalasan), '/'));
                             } else {
                                 $fotoBalasanUrl = '';
                             }

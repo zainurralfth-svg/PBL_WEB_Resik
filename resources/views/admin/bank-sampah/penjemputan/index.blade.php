@@ -158,19 +158,13 @@
                             <td>
                                 @if ($item->foto)
                                     @php
-                                        $fotoPath = str_replace(['storage/', 'uploads/'], '', $item->foto);
-
-                                        if (app()->environment('local')) {
-                                            $fotoUrl = asset('storage/' . $fotoPath);
-                                        } else {
-                                            $fotoUrl = asset('uploads/' . $fotoPath);
-                                        }
+                                        $fotoUrl = asset('uploads/' . ltrim(preg_replace('#^(storage|uploads)/#', '', $item->foto), '/'));
                                     @endphp
 
                                     <img src="{{ $fotoUrl }}" alt="Foto Penjemputan"
-                                        onerror="this.src='{{ asset('images/no-image.png') }}'">
+                                        onerror="this.onerror=null;this.style.visibility='hidden'">
                                 @else
-                                    <img src="{{ asset('images/no-image.png') }}" alt="No Image">
+                                     <span style="color: #999; font-size: 12px;">Tidak ada foto</span>
                                 @endif
                             </td>
                             <td style="font-weight: 500;">{{ $namaPetugas }}</td>
