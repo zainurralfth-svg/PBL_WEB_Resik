@@ -54,11 +54,7 @@ class LaporanController extends Controller
                 $file = $request->file('foto_balasan');
                 $filename = time() . '_balasan_' . $laporan->id . '.' . $file->getClientOriginalExtension();
 
-                if (app()->environment('production')) {
-                    $destination = dirname(base_path()) . '/public_html/uploads/laporan/balasan';
-                } else {
-                    $destination = storage_path('app/public/laporan/balasan');
-                }
+                $destination = $this->uploadDir('laporan/balasan');
 
                 if (!file_exists($destination)) {
                     mkdir($destination, 0755, true);

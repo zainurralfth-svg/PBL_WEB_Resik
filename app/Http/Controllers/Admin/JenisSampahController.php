@@ -49,25 +49,13 @@ class JenisSampahController extends Controller
             $file = $request->file('gambar');
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-            if (app()->environment('production')) {
+            $destination = $this->uploadDir('jenis-sampah');
 
-                $destination = base_path('../public_html/uploads/jenis-sampah');
-
-                if (!file_exists($destination)) {
-                    mkdir($destination, 0755, true);
-                }
-
-                $file->move($destination, $fileName);
-            } else {
-
-                $destination = base_path('../public_html/uploads/jenis-sampah');
-
-                if (!file_exists($destination)) {
-                    mkdir($destination, 0755, true);
-                }
-
-                $file->move($destination, $fileName);
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
             }
+
+            $file->move($destination, $fileName);
 
             $validated['gambar'] = 'jenis-sampah/' . $fileName;
         }
@@ -113,13 +101,7 @@ class JenisSampahController extends Controller
 
             if ($jenisSampah->gambar) {
 
-                if (app()->environment('production')) {
-
-                    $oldFile = base_path('../public_html/uploads/' . $jenisSampah->gambar);
-                } else {
-
-                    $oldFile = storage_path('app/public/' . $jenisSampah->gambar);
-                }
+                $oldFile = $this->uploadDir($jenisSampah->gambar);
 
                 if (file_exists($oldFile)) {
                     unlink($oldFile);
@@ -133,13 +115,7 @@ class JenisSampahController extends Controller
 
             if ($jenisSampah->gambar) {
 
-                if (app()->environment('production')) {
-
-                    $oldFile = base_path('../public_html/uploads/' . $jenisSampah->gambar);
-                } else {
-
-                    $oldFile = storage_path('app/public/' . $jenisSampah->gambar);
-                }
+                $oldFile = $this->uploadDir($jenisSampah->gambar);
 
                 if (file_exists($oldFile)) {
                     unlink($oldFile);
@@ -149,25 +125,13 @@ class JenisSampahController extends Controller
             $file = $request->file('gambar');
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-            if (app()->environment('production')) {
+            $destination = $this->uploadDir('jenis-sampah');
 
-                $destination = base_path('../public_html/uploads/jenis-sampah');
-
-                if (!file_exists($destination)) {
-                    mkdir($destination, 0755, true);
-                }
-
-                $file->move($destination, $fileName);
-            } else {
-
-                $destination = storage_path('app/public/jenis-sampah');
-
-                if (!file_exists($destination)) {
-                    mkdir($destination, 0755, true);
-                }
-
-                $file->move($destination, $fileName);
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
             }
+
+            $file->move($destination, $fileName);
 
             $validated['gambar'] = 'jenis-sampah/' . $fileName;
         }
@@ -191,13 +155,7 @@ class JenisSampahController extends Controller
 
         if ($jenisSampah->gambar) {
 
-            if (app()->environment('production')) {
-
-                $file = base_path('../public_html/uploads/' . $jenisSampah->gambar);
-            } else {
-
-                $file = storage_path('app/public/' . $jenisSampah->gambar);
-            }
+            $file = $this->uploadDir($jenisSampah->gambar);
 
             if (file_exists($file)) {
                 unlink($file);

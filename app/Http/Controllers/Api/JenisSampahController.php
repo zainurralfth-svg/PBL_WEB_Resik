@@ -41,11 +41,6 @@ class JenisSampahController extends Controller
 
     private function getUrlGambar($path)
     {
-        if (app()->environment('production')) {
-            // Hosting: pakai folder uploads
-            return asset('uploads/' . $path);
-        }
-        // Local: pakai storage link dengan IP yang bisa diakses emulator
-        return url('storage/' . $path);
+        return self::uploadUrl($path);
     }
 }

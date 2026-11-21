@@ -228,7 +228,7 @@ class B3WargaController extends Controller
             'jenis'               => $this->jenisText($b),
             'estimasi_berat'      => $this->angka($b->est_berat),
             'berat_terverifikasi' => $this->angka($b->berat_verifikasi),
-            'alasan'              => $status === 'tidak_sesuai' ? $b->alasan_tidak_sesuai : null,
+            'alasan'              => $this->alasanTeks($b, $status),
 
             // --- dipakai B3Service / "Pendaftaran Saya" (lib/models/B3_model.dart) ---
             'id_pendaftaran'      => $b->id,
@@ -266,23 +266,58 @@ class B3WargaController extends Controller
             'tanggal_dijadwalkan' => $this->fmt($b->tgl_dijadwalkan, 'D MMM YYYY'),
             'tanggal_dijemput'    => $this->fmt($b->tgl_dijemput, 'D MMM YYYY'),
             'tanggal_diperiksa'   => $this->fmt($b->tgl_verifikasi, 'D MMM YYYY'),
+            'tanggal_tidak_ada'   => $this->fmt($b->tgl_tidak_ada, 'D MMM YYYY'),
             'status'              => $status,
-            'alasan'              => $status === 'tidak_sesuai' ? $b->alasan_tidak_sesuai : null,
+            'alasan'              => $this->alasanTeks($b, $status),
+            'total_imbalan'       => $status === 'diverifikasi' ? (float) $b->total_imbalan : null,
+            'rincian_saldo'       => $status === 'diverifikasi' ? $this->rincianSaldo($b) : null,
         ];
     }
 
+    /** "Baterai 50 × Rp 1.000 + Lampu 15 × Rp 1.500" dari item yang sudah diverifikasi. */
+    private function rincianSaldo(B3Pendaftaran $b): ?string
+    {
+        $baris = $b->items
+            ->filter(fn ($i) => (float) $i->harga_satuan > 0 && (int) ($i->jumlah_verifikasi ?? 0) > 0)
+            ->map(fn ($i) => $i->jenis_b3 . ' ' . (int) $i->jumlah_verifikasi
+                . ' × Rp ' . number_format((float) $i->harga_satuan, 0, ',', '.'))
+            ->values();
+
+        return $baris->isEmpty() ? null : $baris->join(' + ');
+    }
+
     /**
-     * Status untuk mobile. Di database tidak ada status "tidak_sesuai":
-     * pendaftaran yang ditandai tidak sesuai oleh admin punya alasan_tidak_sesuai
-     * dan belum berstatus diverifikasi.
+     * Status untuk mobile = status di database (terdaftar | dijadwalkan |
+     * menunggu_verifikasi | diverifikasi | tidak_sesuai | tidak_ada_di_tempat).
+     * Data lama yang ditandai tidak sesuai sebelum status itu ada (punya alasan,
+     * masih 'menunggu_verifikasi') tetap dibaca sebagai tidak_sesuai.
      */
     private function statusApi(B3Pendaftaran $b): string
     {
-        if (! empty($b->alasan_tidak_sesuai) && $b->status !== B3Pendaftaran::DIVERIFIKASI) {
+        if ($b->status === B3Pendaftaran::MENUNGGU_VERIFIKASI && ! empty($b->alasan_tidak_sesuai)) {
             return 'tidak_sesuai';
         }
 
-        return $b->status; // terdaftar | dijadwalkan | menunggu_verifikasi | diverifikasi
+        return $b->status;
+    }
+
+    /** Teks alasan untuk warga: Tidak sesuai (dari admin) atau Tidak ada di tempat (dari petugas). */
+    private function alasanTeks(B3Pendaftaran $b, string $status): ?string
+    {
+        if ($status === 'tidak_sesuai') {
+            return $b->alasan_tidak_sesuai;
+        }
+
+        if ($status === 'tidak_ada_di_tempat') {
+            $teks = $b->alasan_tidak_ada_label ?: 'Warga tidak ada di tempat';
+            if (! empty($b->catatan_tidak_ada)) {
+                $teks .= '. ' . $b->catatan_tidak_ada;
+            }
+
+            return $teks;
+        }
+
+        return null;
     }
 
     private function labelStatus(string $kode): string
@@ -293,6 +328,7 @@ class B3WargaController extends Controller
             'menunggu_verifikasi' => 'Menunggu verifikasi',
             'diverifikasi'        => 'Diverifikasi',
             'tidak_sesuai'        => 'Tidak sesuai',
+            'tidak_ada_di_tempat' => 'Tidak ada di tempat',
         ][$kode] ?? ucfirst(str_replace('_', ' ', $kode));
     }
 

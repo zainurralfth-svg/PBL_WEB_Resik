@@ -72,13 +72,7 @@ class ArtikelController extends Controller
 
             $fileName = 'artikel_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
 
-            if (app()->environment('production')) {
-
-                $destination = $_SERVER['DOCUMENT_ROOT'] . '/uploads/artikel';
-            } else {
-
-                $destination = storage_path('app/public/artikel');
-            }
+            $destination = $this->uploadDir('artikel');
 
             if (!file_exists($destination)) {
                 mkdir($destination, 0755, true);
@@ -128,13 +122,7 @@ class ArtikelController extends Controller
 
             $fileName = 'artikel_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
 
-            if (app()->environment('production')) {
-
-                $destination = $_SERVER['DOCUMENT_ROOT'] . '/uploads/artikel';
-            } else {
-
-                $destination = storage_path('app/public/artikel');
-            }
+            $destination = $this->uploadDir('artikel');
 
             if (!file_exists($destination)) {
                 mkdir($destination, 0755, true);
@@ -177,13 +165,7 @@ class ArtikelController extends Controller
 
             if ($artikel->foto) {
 
-                if (app()->environment('production')) {
-
-                    $destination = $_SERVER['DOCUMENT_ROOT'] . '/uploads/artikel';
-                } else {
-
-                    $destination = storage_path('app/public/artikel');
-                }
+                $destination = $this->uploadDir('artikel');
 
                 $old = $destination . '/' . basename($artikel->foto);
 
