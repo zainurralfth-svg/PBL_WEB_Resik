@@ -70,8 +70,7 @@ class B3PendaftaranController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $petugasDlh = Petugas::where('level', 'petugas_dlh')
-            ->orderBy('nama_lengkap')
+        $petugasDlh = Petugas::orderBy('nama_lengkap')
             ->get(['id_petugas', 'nama_lengkap']);
 
         return view('admin.bank-sampah.B3.Index', compact('pendaftarans', 'desas', 'petugasDlh') + ['tab' => 'pendaftaran', 'tabelBelumAda' => false]);
@@ -86,7 +85,7 @@ class B3PendaftaranController extends Controller
             'id_petugas' => [
                 'required',
                 'integer',
-                Rule::exists('petugas', 'id_petugas')->where('level', 'petugas_dlh'),
+                Rule::exists('petugas', 'id_petugas'),
             ],
         ]);
 
@@ -108,7 +107,6 @@ class B3PendaftaranController extends Controller
             $pendaftaran->update([
                 'id_petugas' => $data['id_petugas'],
                 'status' => B3Pendaftaran::DIJADWALKAN,
-                'tgl_dijadwalkan' => now(),
             ]);
 
             return true;
