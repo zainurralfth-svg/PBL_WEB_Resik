@@ -44,6 +44,11 @@
     <div id="rekap-riwayat"></div>
 </div>
 
+<div class="b3-info">
+    Rekap hanya menghitung pendaftaran berstatus <strong>Diverifikasi</strong>. Pendaftaran yang masih
+    <em>Menunggu verifikasi</em> atau <em>Tidak ada di tempat</em> belum masuk ke tabel ini.
+</div>
+
 @include('admin.bank-sampah.B3.Modals.Serah-Terima')
 
 @push('scripts')
@@ -52,7 +57,7 @@
     const items = @json(array_values($rsItems));
     const riwayat = @json($rsRiwayat);
     const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-    const defaultText = 'Unggah berkas (prototype)';
+    const defaultText = 'Unggah berkas';
     const $ = id => document.getElementById(id);
 
     function renderRiwayat() {
