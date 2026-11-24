@@ -1,4 +1,4 @@
-{{-- Tab Rekap versi Sub Desa: tampilan saja, data contoh. Backend nanti bisa kirim $rsItems --}}
+{{-- Tab Rekap versi Sub Desa: tampilan saja, data contoh. Export Excel memakai backend. --}}
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/b3-rekap-sub-desa.css?v=' . time()) }}">
 @endpush
@@ -13,7 +13,7 @@
 @endphp
 
 <div class="sdr-actions">
-    <button type="button" class="sdr-btn" id="sdr-btnExport">Export Excel</button>
+    <a href="{{ route('admin.bank-sampah.b3.rekap.export') }}" class="sdr-btn sdr-btn--link">Export Excel</a>
 </div>
 
 <div class="sdr-table-wrap">
@@ -42,27 +42,3 @@
 @if ($rsTampilDesa)
     <div class="sdr-box">Per desa: Payaman 1 warga</div>
 @endif
-
-<div class="sdr-toast" id="sdr-toast"></div>
-
-@push('scripts')
-<script>
-(function () {
-    const items = @json(array_values($rsItems));
-    const $ = id => document.getElementById(id);
-
-    function toast(msg) {
-        const t = $('sdr-toast'); t.textContent = msg; t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2200);
-    }
-
-    $('sdr-btnExport').onclick = () => {
-        const csv = 'Jenis B3,Jumlah,Nilai Saldo\n' + items.map(i => `${i.jenis},${i.jumlah},${i.nilai}`).join('\n');
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-        a.download = 'rekap-b3-desa.csv'; a.click();
-        toast('Rekap diekspor');
-    };
-})();
-</script>
-@endpush
