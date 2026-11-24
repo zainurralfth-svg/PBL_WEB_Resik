@@ -14,7 +14,7 @@
 @endphp
 
 <div class="rekap-actions">
-    <button type="button" class="rekap-btn" id="rs-btnExport">Export Excel</button>
+    <a href="{{ route('admin.bank-sampah.b3.rekap.export') }}" class="rekap-btn rekap-btn--link">Export Excel</a>
     <button type="button" class="rekap-btn" id="rs-btnOpen">Catat Serah Terima</button>
 </div>
 
@@ -91,14 +91,6 @@
         const total = items.reduce((s, i) => s + i.jumlah, 0);
         riwayat.unshift({ tgl: `${d.getDate()} ${bulan[d.getMonth()]}`, jumlah: total, tujuan: $('rs-tujuan').value, penerima: nama });
         renderRiwayat(); closeModal(); toast('Serah terima berhasil dicatat');
-    };
-
-    $('rs-btnExport').onclick = () => {
-        const csv = 'Jenis B3,Jumlah,Nilai Saldo\n' + items.map(i => `${i.jenis},${i.jumlah},${i.nilai}`).join('\n');
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-        a.download = 'rekap-b3.csv'; a.click();
-        toast('Rekap diekspor');
     };
 
     renderRiwayat();
