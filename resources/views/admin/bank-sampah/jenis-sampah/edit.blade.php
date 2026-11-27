@@ -42,10 +42,10 @@
                         @if ($jenisSampah->gambar)
                             @php
                                 $gambarUrl = asset('uploads/' . ltrim(preg_replace('#^(storage|uploads)/#', '', $jenisSampah->gambar), '/'));
-                                $gambarUrl = asset($disk . '/' . $jenisSampah->gambar);
                             @endphp
                             <div style="display: inline-block; position: relative;">
                                 <img src="{{ $gambarUrl }}" alt="{{ $jenisSampah->jenis }}" id="current-image"
+                                    onerror="this.onerror=null;this.style.visibility='hidden'"
                                     style="max-width: 180px; height: auto; border-radius: 8px; cursor: pointer; border: 2px solid #e5e7eb;">
 
                                 {{-- ✅ TOMBOL HAPUS GAMBAR (X) --}}

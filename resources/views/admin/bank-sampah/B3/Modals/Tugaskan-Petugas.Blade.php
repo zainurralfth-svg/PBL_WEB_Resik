@@ -1,9 +1,9 @@
-{{-- Dialog "Tugaskan petugas". Dipakai oleh Tabs/Pendaftaran.blade.php. Variabel: $petugasDlh --}}
+{{-- Dialog "Tugaskan petugas". Dipakai oleh Tabs/Pendaftaran.blade.php dan Tabs/Periode.blade.php. Variabel: $petugasDlh --}}
 <dialog id="b3-dialog" class="b3-dialog" aria-labelledby="b3-dialog-judul">
     <form method="POST" id="b3-dialog-form">
         @csrf
         <h2 id="b3-dialog-judul">Tugaskan petugas</h2>
-        <p>Penjemputan B3 untuk <strong id="b3-dialog-nama"></strong></p>
+        <p>Penjemputan B3 untuk <strong id="b3-dialog-nama"></strong><span id="b3-dialog-info"></span></p>
 
         <label for="b3-petugas">Petugas DLH</label>
         <select id="b3-petugas" name="id_petugas" required>
@@ -12,6 +12,10 @@
                 <option value="{{ $petugas->id_petugas }}">{{ $petugas->nama_lengkap }}</option>
             @endforeach
         </select>
+        <p class="b3-dialog__catatan">
+            Terisi otomatis dari petugas periode. Status pendaftaran berubah menjadi
+            <strong>Dijadwalkan</strong> dan warga mendapat notifikasi.
+        </p>
 
         <div class="b3-dialog__aksi">
             <button type="button" class="b3-btn b3-btn--sekunder" id="b3-dialog-batal">Batal</button>

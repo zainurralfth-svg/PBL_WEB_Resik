@@ -261,7 +261,7 @@ class PenjemputanController extends Controller
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'nama_admin' => 'required|string',
             'waktu' => 'required|date',
-            'berat' => 'required|numeric',
+            'berat' => 'required|numeric|min:0.1|max:1000',
             'lokasi' => 'required|string',
             'keterangan' => 'nullable|string',
             'status' => 'required|in:diproses,disetujui,ditolak',

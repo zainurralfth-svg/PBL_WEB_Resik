@@ -15,3 +15,4 @@
 
 .sdr-toast{position:fixed;bottom:20px;right:20px;background:#4fa574;color:#1b2e22;padding:12px 18px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.3s;z-index:1100}
 .sdr-toast.show{opacity:1;transform:none}
+.sdr-btn--link{display:inline-flex;align-items:center;text-decoration:none}

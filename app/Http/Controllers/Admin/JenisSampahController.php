@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\JenisSampah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class JenisSampahController extends Controller
 {
@@ -37,11 +38,26 @@ class JenisSampahController extends Controller
                 ->with('error', '❌ Anda tidak memiliki izin untuk menambah jenis sampah!');
         }
 
+        $request->merge(['jenis' => trim((string) $request->input('jenis'))]);
+
         $validated = $request->validate([
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
-            'jenis' => 'required|string|max:100',
+            'jenis' => ['required', 'string', 'max:100', 'unique:jenis_sampah,jenis'],
             'satuan' => 'required|in:Kg,Lt,Pcs,Pack,Lusin',
             'harga' => 'required|numeric|min:0',
+        ], [
+            'jenis.unique' => 'Jenis sampah sudah ada.',
+            'jenis.required' => 'Nama jenis sampah wajib diisi.',
+            'jenis.max' => 'Nama jenis sampah maksimal 100 karakter.',
+            'satuan.required' => 'Satuan wajib dipilih.',
+            'satuan.in' => 'Satuan tidak valid.',
+            'harga.required' => 'Harga wajib diisi.',
+            'harga.numeric' => 'Harga harus berupa angka.',
+            'harga.min' => 'Harga minimal Rp 1.',
+            'harga.max' => 'Harga maksimal Rp 1.000.000 per satuan.',
+            'gambar.image' => 'File harus berupa gambar.',
+            'gambar.mimes' => 'Gambar harus berformat JPG, JPEG, atau PNG.',
+            'gambar.max' => 'Ukuran gambar maksimal 10 MB.',
         ]);
 
         if ($request->hasFile('gambar')) {
@@ -90,11 +106,16 @@ class JenisSampahController extends Controller
 
         $jenisSampah = JenisSampah::findOrFail($id);
 
+        $request->merge(['jenis' => trim((string) $request->input('jenis'))]);
+
         $validated = $request->validate([
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
-            'jenis' => 'required|string|max:100',
+            'jenis' => ['required', 'string', 'max:100',
+                Rule::unique('jenis_sampah', 'jenis')->ignore($id, 'id_jenis_sampah')],
             'satuan' => 'required|in:Kg,Lt,Pcs,Pack,Lusin',
             'harga' => 'required|numeric|min:0',
+        ], [
+            'jenis.unique' => 'Jenis sampah sudah ada.',
         ]);
 
         if ($request->input('remove_current_image') == '1') {

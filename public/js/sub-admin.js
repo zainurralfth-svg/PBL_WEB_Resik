@@ -167,6 +167,9 @@ function clearErrors() {
         el.style.display = 'none';
         el.textContent = '';
     });
+    document.querySelectorAll('#subAdminForm .form-control').forEach(el => {
+        el.style.borderColor = '';
+    });
 }
 
 // ===== SIDEBAR TOGGLE =====
@@ -230,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(data => {
                     if (data.success) {
-                        closeSubAdminModal();  // ← GANTI INI
+                        closeSubAdminModal();
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil!',
@@ -244,18 +247,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (data.errors) {
                             Object.keys(data.errors).forEach(key => {
                                 const errorEl = document.getElementById(key + 'Error');
+                                const inputEl = document.getElementById(key);
                                 if (errorEl) {
                                     errorEl.textContent = data.errors[key][0];
                                     errorEl.style.display = 'block';
                                 }
+                                if (inputEl) {
+                                    inputEl.style.borderColor = '#dc3545';
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: data.message || 'Terjadi kesalahan'
                             });
                         }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal!',
-                            text: data.message || 'Terjadi kesalahan'
-                        });
                     }
                 })
                 .catch(error => {

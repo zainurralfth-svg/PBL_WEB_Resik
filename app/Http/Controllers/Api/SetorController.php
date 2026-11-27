@@ -121,9 +121,14 @@ class SetorController extends Controller
             'id_pns' => 'nullable|integer|exists:pns,id_pns',
             'id_petugas' => 'required|integer|exists:petugas,id_petugas',
             'id_jenis_sampah' => 'required|integer|exists:jenis_sampah,id_jenis_sampah',
-            'berat' => 'required|numeric|min:0.1',
+            'berat' => 'required|numeric|min:0.1|max:1000',
             'tanggal_transaksi' => 'nullable|date',
-        ]);
+        ], [
+                'berat.required' => 'Berat wajib diisi.',
+                'berat.numeric'  => 'Berat harus berupa angka.',
+                'berat.min'      => 'Berat minimal 0,1 kg.',
+                'berat.max'      => 'Berat maksimal 1000 kg.',
+            ]);
 
         if ($validator->fails()) {
             return response()->json([

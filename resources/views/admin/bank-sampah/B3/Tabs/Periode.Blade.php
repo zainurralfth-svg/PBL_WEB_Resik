@@ -63,7 +63,7 @@
     .b3-table--periode td:nth-child(n+2){text-align:center}
     .b3-table--periode tbody td{height:auto;padding:9px 14px;line-height:1.3}
     .b3-sub{display:block;margin-top:2px;font-size:.68rem;color:#3a3a3a}
-    .b3-pill--dibuka{background:#c8f0d2;border:1px solid #2e9d45;color:#14532d}
+    .b3-pill--dibuka{background:#8fdc9b;border:1px solid #2e9d45;color:#14532d}
     .b3-pill--ditutup{background:#fbeeb0;border:1px solid #b8a64a}
     .b3-pill--selesai{background:#e0e0e0;border:1px solid #888}
     .b3-pill{min-width:84px}
@@ -139,6 +139,12 @@
             @endforelse
         </tbody>
     </table>
+</div>
+
+<div class="b3-info">
+    Status periode dihitung otomatis dari tanggal: <strong>Dijadwalkan</strong> (belum buka) &rarr;
+    <strong>Dibuka</strong> &rarr; <strong>Ditutup</strong> (pendaftaran tutup, penugasan &amp; penjemputan)
+    &rarr; <strong>Selesai</strong> (petugas menyelesaikan rute).
 </div>
 
 @if ($bisaKelola)

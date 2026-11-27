@@ -183,9 +183,14 @@ class SetorController extends Controller
         }
 
         $validated = $request->validate([
-            'berat' => 'required|numeric|min:0.1',
+            'berat' => 'required|numeric|min:0.1|max:1000',
             'catatan_koreksi' => 'required|string|max:255',
-        ]);
+        ], [
+                'berat.required' => 'Berat wajib diisi.',
+                'berat.numeric'  => 'Berat harus berupa angka.',
+                'berat.min'      => 'Berat minimal 0,1 kg.',
+                'berat.max'      => 'Berat maksimal 1000 kg.',
+            ]);
 
         $beratLama = $transaksi->berat;
         $beratBaru = $validated['berat'];
@@ -245,8 +250,13 @@ class SetorController extends Controller
             'id_masyarakat'   => 'nullable|exists:masyarakat,id_masyarakat',
             'id_pns'          => 'nullable|exists:pns,id_pns',
             'id_jenis_sampah' => 'required|exists:jenis_sampah,id_jenis_sampah',
-            'berat'           => 'required|numeric|min:0.1',
-        ]);
+            'berat' => 'required|numeric|min:0.1|max:1000',
+        ], [
+                'berat.required' => 'Berat wajib diisi.',
+                'berat.numeric'  => 'Berat harus berupa angka.',
+                'berat.min'      => 'Berat minimal 0,1 kg.',
+                'berat.max'      => 'Berat maksimal 1000 kg.',
+          ]);
 
         // Validasi: Harus ada salah satu
         if (empty($validated['id_masyarakat']) && empty($validated['id_pns'])) {

@@ -18,11 +18,16 @@ class PenjemputanController extends Controller
             'nama_admin' => 'required|string',
             'waktu' => 'required|date',
             'lokasi' => 'required|string',
-            'berat' => 'required|numeric|min:0.1',
+            'berat' => 'required|numeric|min:0.1|max:1000',
             'keterangan' => 'nullable|string',
             'status' => 'nullable|in:diproses,disetujui,ditolak',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
-        ]);
+        ], [
+                'berat.required' => 'Berat wajib diisi.',
+                'berat.numeric'  => 'Berat harus berupa angka.',
+                'berat.min'      => 'Berat minimal 0,1 kg.',
+                'berat.max'      => 'Berat maksimal 1000 kg.',
+            ]);
 
         if ($validator->fails()) {
             return response()->json([

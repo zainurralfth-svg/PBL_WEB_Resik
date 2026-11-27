@@ -27,6 +27,7 @@ use App\Http\Controllers\BankSampah\PenjemputanController;
 use App\Http\Controllers\BankSampah\B3Controller;
 use App\Http\Controllers\BankSampah\B3PendaftaranController;
 use App\Http\Controllers\BankSampah\B3VerifikasiController;
+use App\Http\Controllers\BankSampah\B3RekapController;
 use App\Http\Controllers\BankSampah\SetorController;
 
 /*
@@ -217,6 +218,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
                     ->whereNumber('id')
                     ->name('verifikasi.tidak-sesuai');
                 Route::view('/rekap', 'admin.bank-sampah.B3.Index', ['tab' => 'rekap'])->name('rekap.index');
+                Route::get('/rekap/export', [B3RekapController::class, 'export'])->name('rekap.export');
             });
 
             // ── Setor Sampah ──
