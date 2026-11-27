@@ -600,6 +600,12 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const petugasId = document.getElementById('petugasId');
             const isEdit = petugasId && petugasId.value !== '';
+                        hapusErrorField(formPetugas);
+            const errLokal = validasiPetugasLokal(formPetugas, isEdit);
+            if (Object.keys(errLokal).length) {
+                tampilkanErrorField(formPetugas, errLokal);
+                return;
+            }
             const btnSimpan = document.getElementById('btnSimpanPetugas');
 
             if (btnSimpan) {
@@ -630,15 +636,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     const result = await response.json();
 
                     if (result.success || response.ok) {
-                        // ✅ LANGKAH 1: Tutup modal DULU (tanpa animasi) sebelum SweetAlert
+                        // LANGKAH 1: Tutup modal DULU (tanpa animasi) sebelum SweetAlert
                         const modal = document.getElementById('modalPetugas');
                         if (modal) {
                             modal.classList.remove('active');
                             modal.style.display = 'none';
-                            document.body.style.overflow = ''; // Unlock scroll
+                            document.body.style.overflow = '';
                         }
-
-                        // ✅ LANGKAH 2: Baru tampilkan SweetAlert
+                        // LANGKAH 2: Baru tampilkan SweetAlert
                         Swal.fire({
                             title: 'Berhasil!',
                             text: isEdit ? 'Data petugas telah diperbarui.' : 'Petugas baru berhasil ditambahkan.',
@@ -648,37 +653,41 @@ document.addEventListener('DOMContentLoaded', function () {
                             showConfirmButton: false
                         });
 
-                        // ✅ LANGKAH 3: Reload setelah SweetAlert selesai
+                        // LANGKAH 3: Reload setelah SweetAlert selesai
                         setTimeout(() => {
                             location.reload();
                         }, 2100); // Sedikit lebih lama dari timer SweetAlert
 
+                        } else if (response.status === 422 && result.errors) {
+                            // Error validasi dari server: tampil di bawah field masing-masing
+                            tampilkanErrorField(formPetugas, result.errors);
+
+                        } else {
+                            // Error lain (bukan validasi): tetap pakai pop up
+                            Swal.fire({
+                                title: 'Gagal!',
+                                text: result.message || 'Terjadi kesalahan',
+                                icon: 'error',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        }
                     } else {
-                        Swal.fire({
-                            title: 'Gagal!',
-                            text: result.message || 'Terjadi kesalahan',
-                            icon: 'error',
-                            confirmButtonColor: '#dc3545'
-                        });
+                        const errorText = await response.text();
+                        console.error('Server Error:', errorText);
+                        alert('❌ Gagal: Server error.');
                     }
-                } else {
-                    const errorText = await response.text();
-                    console.error('Server Error:', errorText);
-                    alert('❌ Gagal: Server error.');
-                }
-            } catch (error) {
-                console.error('Fetch Error:', error);
-                alert('❌ Network error: ' + error.message);
-            }
-            finally {
-                if (btnSimpan) {
-                    btnSimpan.disabled = false;
-                    btnSimpan.textContent = isEdit ? 'Update' : 'Simpan';
+                    } catch (error) {
+                        console.error('Fetch Error:', error);
+                        alert('❌ Network error: ' + error.message);
+                    }
+                    finally {
+                        if (btnSimpan) {
+                            btnSimpan.disabled = false;
+                            btnSimpan.textContent = isEdit ? 'Update' : 'Simpan';
                 }
             }
         });
     }
-
     // Search filter
     initAccountSearch();
 
@@ -1039,3 +1048,63 @@ document.addEventListener('click', function (e) {
         }
     }
 });
+
+// ===== ERROR PER-FIELD (tampil di bawah input) =====
+function hapusErrorField(form) {
+    if (!form) return;
+    form.querySelectorAll('.field-error').forEach(el => el.remove());
+    form.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+}
+
+function tampilkanErrorField(form, errors) {
+    let pertama = null;
+    Object.keys(errors).forEach(nama => {
+        const pesan = Array.isArray(errors[nama]) ? errors[nama][0] : errors[nama];
+        let input;
+        if (nama === 'level') {
+            // level diisi lewat dropdown tipe → kecamatan → desa
+            const tipe = form.querySelector('#tipeWilayah');
+            const kec = form.querySelector('#kecamatanSelect');
+            const desa = form.querySelector('#desaSelect');
+            if (tipe && tipe.value === 'bank_sampah') {
+                input = (kec && !kec.value) ? kec : desa;
+            } else {
+                input = tipe;
+            }
+        } else {
+            input = form.querySelector(`[name="${nama}"]`);
+        }
+        if (!input) return;
+        const group = input.closest('.form-group') || input.parentElement;
+        group.querySelector('.field-error')?.remove();
+        const span = document.createElement('span');
+        span.className = 'field-error';
+        span.textContent = pesan;
+        group.appendChild(span);
+        input.classList.add('has-error');
+        if (!pertama) pertama = input;
+    });
+    if (pertama) pertama.focus();
+}
+
+function validasiPetugasLokal(form, isEdit) {
+    const err = {};
+    const nilai = n => (form.querySelector(`[name="${n}"]`)?.value || '');
+    if (!nilai('nama_lengkap').trim()) err.nama_lengkap = ['Nama petugas wajib diisi.'];
+
+    const email = nilai('email').trim().toLowerCase();
+    if (!email) err.email = ['Email wajib diisi.'];
+    else if (!/^[a-z0-9._%+\-]+@gmail\.com$/.test(email)) err.email = ['Email harus menggunakan @gmail.com.'];
+
+    const tel = nilai('no_telepon').trim();
+    if (!tel) err.no_telepon = ['No. telepon wajib diisi.'];
+    else if (/^08[0-9]{10,11}$/.test(tel)) err.no_telepon = ['No. telepon harus 12 sampai 13 angka (hanya angka).'];
+
+    if (!nilai('level')) err.level = ['Pilih wilayah kerja yang valid.'];
+
+    const pw = nilai('password');
+    if (!isEdit && !pw) err.password = ['Kata sandi wajib diisi.'];
+    else if (pw && pw.length < 8) err.password = ['Kata sandi minimal 8 karakter.'];
+
+    return err;
+}

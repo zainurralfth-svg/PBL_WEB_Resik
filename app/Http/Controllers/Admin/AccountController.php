@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rules\Password;
 
 class AccountController extends Controller
 {
@@ -84,9 +85,10 @@ class AccountController extends Controller
 
         $validated = $request->validate([
             'email' => 'required|email|max:255|unique:admin,email,' . $id . ',id_admin',
-            'password' => 'nullable|string|min:8|max:50|regex:/^[a-zA-Z0-9\s]+$/',
+            'password' => ['nullable', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()->symbols()],
         ], [
-            'password.regex' => 'Sandi tidak boleh mengandung karakter spesial. Hanya boleh huruf, angka, dan spasi.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+            'password.max' => 'Kata sandi maksimal 50 karakter.',
         ]);
 
         $updateData = ['email' => $validated['email']];

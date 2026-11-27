@@ -129,7 +129,7 @@
         </div>
 
         <!-- Form Body -->
-        <form id="formPetugas" class="modal-body">
+        <form id="formPetugas" class="modal-body" novalidate>
             <input type="hidden" id="petugasId" name="id">
             @csrf
 

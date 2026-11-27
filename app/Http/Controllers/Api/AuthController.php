@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rules\Password;
 use App\Helpers\BarcodeHelper;
 
 class AuthController extends Controller
@@ -22,9 +23,9 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'tipe' => 'required|in:masyarakat,pns',
             'nama' => 'required|string|max:100',
-            'email' => 'required|email|unique:masyarakat,email|unique:pns,email',
-            'password' => 'required|min:8|confirmed',
-            'no_telepon' => 'required|string|max:15',
+            'email' => ['required', 'email', 'max:150', 'regex:/^[A-Za-z0-9._%+\-]+@gmail\.com$/i', 'unique:masyarakat,email', 'unique:pns,email'],
+            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+            'no_telepon' => ['required', 'regex:/^08[0-9]{10,11}$/'],
             'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan',
             'tanggal_lahir' => 'nullable|date|before:today',
             'alamat' => 'nullable|string',
@@ -32,6 +33,16 @@ class AuthController extends Controller
             'id_desa' => 'required|exists:desa,id_desa',
 
             'id_dinas' => 'required_if:tipe,pns|nullable|exists:dinas,id_dinas',
+        ], [
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+            'password.mixed' => 'Kata sandi harus mengandung huruf besar dan huruf kecil.',
+            'password.numbers' => 'Kata sandi harus mengandung angka.',
+            'password.symbols' => 'Kata sandi harus mengandung simbol (contoh: !@#$%&*).',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            'email.regex' => 'Email harus menggunakan @gmail.com.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'no_telepon.required' => 'No. telepon wajib diisi.',
+            'no_telepon.regex'    => 'No. telepon harus diawali 08 dan terdiri dari 12 sampai 13 angka.',
         ]);
 
         if ($validator->fails()) {
@@ -381,7 +392,10 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'token' => 'required|string',
-            'password' => 'required|min:8|confirmed',
+            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+        ], [
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
         ]);
 
         if ($validator->fails()) {
@@ -572,7 +586,9 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer',
             'tipe' => 'required|in:masyarakat,pns',
-            'email' => 'nullable|email', // ✅ OPSIONAL: ada untuk ubah email, kosong untuk ubah password
+            'email' => ['nullable', 'email', 'regex:/^[A-Za-z0-9._%+\-]+@gmail\.com$/i'],
+        ], [
+            'email.regex' => 'Email harus menggunakan @gmail.com.',
         ]);
 
         if ($validator->fails()) {
@@ -711,10 +727,11 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer',
             'tipe' => 'required|in:masyarakat,pns',
-            'email' => 'required|email',
+            'email' => ['required', 'email', 'regex:/^[A-Za-z0-9._%+\-]+@gmail\.com$/i'],
             'otp' => 'required|string|size:4',
+        ], [
+            'email.regex' => 'Email harus menggunakan @gmail.com.',
         ]);
-
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
@@ -787,8 +804,11 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer',
             'tipe' => 'required|in:masyarakat,pns',
-            'password_baru' => 'required|min:8|confirmed',
+            'password_baru' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'otp' => 'required|string|size:4',
+        ], [
+            'password_baru.min' => 'Kata sandi minimal 8 karakter.',
+            'password_baru.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
         ]);
 
         if ($validator->fails()) {

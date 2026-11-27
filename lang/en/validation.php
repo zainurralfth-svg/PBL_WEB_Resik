@@ -112,11 +112,11 @@ return [
     'not_in' => 'The selected :attribute is invalid.',
     'not_regex' => 'The :attribute format is invalid.',
     'numeric' => 'The :attribute must be a number.',
-    'password' => [
-        'letters' => 'The :attribute must contain at least one letter.',
-        'mixed' => 'The :attribute must contain at least one uppercase and one lowercase letter.',
-        'numbers' => 'The :attribute must contain at least one number.',
-        'symbols' => 'The :attribute must contain at least one symbol.',
+        'password' => [
+        'letters' => 'Kata sandi harus mengandung huruf.',
+        'mixed' => 'Kata sandi harus mengandung huruf besar dan huruf kecil.',
+        'numbers' => 'Kata sandi harus mengandung angka.',
+        'symbols' => 'Kata sandi harus mengandung simbol (contoh: !@#$%&*).',
         'uncompromised' => 'The given :attribute has appeared in a data leak. Please choose a different :attribute.',
     ],
     'present' => 'The :attribute field must be present.',

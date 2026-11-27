@@ -8,6 +8,7 @@ use App\Services\EncryptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rules\Password;
 
 class PetugasController extends Controller
 {
@@ -17,11 +18,12 @@ class PetugasController extends Controller
     public function store(Request $request)
     {
         try {
+            $request->merge(['nama_lengkap' => preg_replace('/\s+/', ' ', trim((string) $request->input('nama_lengkap')))]);
             $validated = $request->validate([
-                'nama_lengkap' => 'required|string|max:100',
-                'email' => 'required|email|max:150|unique:petugas,email',
-                'password' => 'required|string|min:8|max:50', // ✅ TANPA REGEX - boleh karakter spesial
-                'no_telepon' => 'required|string|max:15',
+                'nama_lengkap' => ['required', 'string', 'min:3', 'max:100', 'regex:/^[\pL\s.\'\-]+$/u'],
+                'email' => ['required', 'email', 'max:150', 'regex:/^[A-Za-z0-9._%+\-]+@gmail\.com$/i', 'unique:petugas,email'],
+                'password' => ['required', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()->symbols()], // TANPA REGEX - boleh karakter spesial
+                'no_telepon' => ['required', 'regex:/^08[0-9]{10,11}$/'],
                 'level' => [
                     'required',
                     'string',
@@ -30,10 +32,19 @@ class PetugasController extends Controller
                         if ($value !== 'petugas_dlh' && !preg_match('/^bank_sampah_\d+$/', $value)) {
                             $fail('Pilih wilayah kerja yang valid.');
                         }
-                    }
-                ], 
+                    },
+                ],
+            ], [
+                'password.required' => 'Kata sandi wajib diisi.',
+                'password.min'      => 'Kata sandi minimal 8 karakter.',
+                'password.max'      => 'Kata sandi maksimal 50 karakter.',
                 'email.unique' => 'Email sudah terdaftar.',
-                'level.in' => 'Pilih level petugas yang valid.',
+                'email.regex' => 'Email harus menggunakan @gmail.com.',
+                'no_telepon.digits_between' => 'No. telepon harus 12 sampai 13 angka (hanya angka).',
+                'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+                'nama_lengkap.min'      => 'Nama minimal 3 karakter.',
+                'nama_lengkap.max'      => 'Nama maksimal 100 karakter.',
+                'nama_lengkap.regex'    => 'Nama hanya boleh berisi huruf, spasi, titik, apostrof, dan tanda hubung (tanpa angka).',
             ]);
 
             $hashedPassword = Hash::make($validated['password']);
@@ -76,24 +87,36 @@ class PetugasController extends Controller
         try {
             $petugas = Petugas::findOrFail($id);
 
+            $request->merge(['nama_lengkap' => preg_replace('/\s+/', ' ', trim((string) $request->input('nama_lengkap')))]);
+
             $validated = $request->validate([
-                'nama_lengkap' => 'required|string|max:100',
-                'email' => 'required|email|max:150|unique:petugas,email,' . $id . ',id_petugas',
-                'password' => 'nullable|string|min:8|max:50', // ✅ TANPA REGEX - boleh karakter spesial
-                'no_telepon' => 'required|string|max:15',
+                'nama_lengkap' => ['required', 'string', 'min:3', 'max:100', 'regex:/^[\pL\s.\'\-]+$/u'],
+                'email' => ['required', 'email', 'max:150', 'regex:/^[A-Za-z0-9._%+\-]+@gmail\.com$/i', 'unique:petugas,email,' . $id . ',id_petugas'],
+                'password' => ['nullable', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()->symbols()], // TANPA REGEX - boleh karakter spesial
+                'no_telepon' => ['required', 'regex:/^08[0-9]{10,11}$/'],
                 'level' => [
                     'required',
                     'string',
-                    function ($attribute, $value, $fail) {
+                        function ($attribute, $value, $fail) {
+                        // Validasi custom: harus 'petugas_dlh' atau 'bank_sampah_{id_desa}'
                         if ($value !== 'petugas_dlh' && !preg_match('/^bank_sampah_\d+$/', $value)) {
                             $fail('Pilih wilayah kerja yang valid.');
                         }
-                    }
-                ], 
+                    },
+                ],
+            ], [
+                'password.required' => 'Kata sandi wajib diisi.',
+                'password.min'      => 'Kata sandi minimal 8 karakter.',
+                'password.max'      => 'Kata sandi maksimal 50 karakter.',
                 'email.unique' => 'Email sudah terdaftar.',
-                'level.in' => 'Pilih level petugas yang valid.',
+                'email.regex' => 'Email harus menggunakan @gmail.com.',
+                'no_telepon.required' => 'No. telepon wajib diisi.',
+                'no_telepon.regex'    => 'No. telepon harus diawali 08 dan terdiri dari 12 sampai 13 angka.',
+                'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+                'nama_lengkap.min'      => 'Nama minimal 3 karakter.',
+                'nama_lengkap.max'      => 'Nama maksimal 100 karakter.',
+                'nama_lengkap.regex'    => 'Nama hanya boleh berisi huruf, spasi, titik, apostrof, dan tanda hubung (tanpa angka).',
             ]);
-
             $updateData = [
                 'nama_lengkap' => $validated['nama_lengkap'],
                 'email' => $validated['email'],

@@ -10,6 +10,7 @@ use App\Services\EncryptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rules\Password;
 
 class SubAdminController extends Controller
 {
@@ -59,18 +60,27 @@ class SubAdminController extends Controller
     public function store(Request $request)
     {
         try {
+            $request->merge(['nama_lengkap' => preg_replace('/\s+/', ' ', trim((string) $request->input('nama_lengkap')))]);
             $validated = $request->validate([
-                'nama' => 'required|string|max:100',           // ✅ BARU
-                'email' => 'required|email|max:255|unique:admin,email',
-                'no_telepon' => 'required|string|max:20',      // ✅ BARU
-                'password' => 'required|string|min:8|max:50',
+                'nama' => ['required', 'string', 'min:3', 'max:100', 'regex:/^[\pL\s.\'\-]+$/u'],           // ✅ BARU
+                'no_telepon' => ['required', 'regex:/^08[0-9]{10,11}$/'],
+                'email' => ['required', 'email', 'max:255', 'regex:/^[A-Za-z0-9._%+\-]+@gmail\.com$/i', 'unique:admin,email'],
+                'password' => ['required', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()->symbols()],
                 'id_kecamatan' => 'required|exists:kecamatan,id_kecamatan',
                 'id_desa' => 'required|exists:desa,id_desa',
             ], [
-                'nama.required' => 'Nama wajib diisi.',
+                'password.required' => 'Kata sandi wajib diisi.',
+                'password.min'      => 'Kata sandi minimal 8 karakter.',
+                'password.max'      => 'Kata sandi maksimal 50 karakter.',
                 'email.unique' => 'Email sudah terdaftar.',
-                'no_telepon.required' => 'No telepon wajib diisi.',
+                'email.regex' => 'Email harus menggunakan @gmail.com.',
+                'no_telepon.required' => 'No. telepon wajib diisi.',
+                'no_telepon.regex'    => 'No. telepon harus diawali 08 dan terdiri dari 12 sampai 13 angka.',
                 'id_desa.exists' => 'Desa tidak valid.',
+                'nama.required' => 'Nama wajib diisi.',
+                'nama.min'      => 'Nama minimal 3 karakter.',
+                'nama.max'      => 'Nama maksimal 100 karakter.',
+                'nama.regex'    => 'Nama hanya boleh berisi huruf, spasi, titik, apostrof, dan tanda hubung (tanpa angka).',
             ]);
 
             // Validasi: desa harus sesuai kecamatan
@@ -131,13 +141,29 @@ class SubAdminController extends Controller
                 ], 403);
             }
 
+            $request->merge(['nama_lengkap' => preg_replace('/\s+/', ' ', trim((string) $request->input('nama_lengkap')))]);
+
             $validated = $request->validate([
-                'nama' => 'required|string|max:100',           // ✅ BARU
-                'email' => 'required|email|max:255|unique:admin,email,' . $id . ',id_admin',
-                'no_telepon' => 'required|string|max:20',      // ✅ BARU
-                'password' => 'nullable|string|min:8|max:50',
+                'nama' => ['required', 'string', 'min:3', 'max:100', 'regex:/^[\pL\s.\'\-]+$/u'],           // ✅ BARU
+                'email' => ['required', 'email', 'max:255', 'regex:/^[A-Za-z0-9._%+\-]+@gmail\.com$/i', 'unique:admin,email,' . $id . ',id_admin'],           // ✅ BARU
+                'no_telepon' => ['required', 'regex:/^08[0-9]{10,11}$/'],
+                'password' => ['nullable', 'string', 'max:50', Password::min(8)->mixedCase()->numbers()->symbols()],
                 'id_kecamatan' => 'required|exists:kecamatan,id_kecamatan',
                 'id_desa' => 'required|exists:desa,id_desa',
+            ], [
+                'password.required' => 'Kata sandi wajib diisi.',
+                'password.min'      => 'Kata sandi minimal 8 karakter.',
+                'password.max'      => 'Kata sandi maksimal 50 karakter.',
+                'email.regex' => 'Email harus menggunakan @gmail.com.',
+                'nama.required' => 'Nama wajib diisi.',
+                'email.unique' => 'Email sudah terdaftar.',
+                'no_telepon.required' => 'No. telepon wajib diisi.',
+                'no_telepon.regex'    => 'No. telepon harus diawali 08 dan terdiri dari 12 sampai 13 angka.',
+                'id_desa.exists' => 'Desa tidak valid.',
+                'nama.required' => 'Nama wajib diisi.',
+                'nama.min'      => 'Nama minimal 3 karakter.',
+                'nama.max'      => 'Nama maksimal 100 karakter.',
+                'nama.regex'    => 'Nama hanya boleh berisi huruf, spasi, titik, apostrof, dan tanda hubung (tanpa angka).',
             ]);
 
             // Validasi: desa harus sesuai kecamatan

@@ -1376,3 +1376,18 @@ body {
         width: 100%;
     }
 }
+
+/* Pesan error di bawah field */
+.field-error {
+    display: block;
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+.modal-body .form-group input.has-error,
+.modal-body .form-group select.has-error {
+    border-color: #dc3545;
+    background: #fff5f5;
+}

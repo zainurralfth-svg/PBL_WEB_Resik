@@ -20,18 +20,21 @@ class ProfileController extends Controller
             'user_id' => 'required|integer',
             'tipe' => 'required|in:masyarakat,pns',
             'nama' => 'nullable|string|max:100',
-            'no_telepon' => 'nullable|string|max:15',
-            'tanggal_lahir' => 'nullable|date',
+            'no_telepon' => ['nullable', 'regex:/^08[0-9]{10,11}$/'],
+            'tanggal_lahir' => 'nullable|date|before:today',
             'alamat' => 'nullable|string|max:255',
             'jenis_kelamin' => 'nullable|string|max:20',
             // maksimal 10MB
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
+        ], [
+            'no_telepon.regex' => 'No telepon harus berupa angka dan memiliki panjang antara 12 hingga 13 digit.',
+            'tanggal_lahir.before' => 'Tanggal lahir harus sebelum hari ini dan bukan di masa depan.',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Validasi gagal',
+                'message' => $validator->errors()->first(),
                 'errors' => $validator->errors()
             ], 422);
         }

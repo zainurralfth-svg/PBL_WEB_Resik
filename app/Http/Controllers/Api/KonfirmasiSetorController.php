@@ -90,10 +90,15 @@ class KonfirmasiSetorController extends Controller
     {
         $request->validate([
             'id_jenis_sampah' => 'required|integer|exists:jenis_sampah,id_jenis_sampah',
-            'berat' => 'required|numeric|min:0.1',
+            'berat' => 'required|numeric|min:0.1|max:1000',
             'id_petugas' => 'required|integer',
             'catatan' => 'nullable|string',
-        ]);
+        ], [
+                'berat.required' => 'Berat wajib diisi.',
+                'berat.numeric'  => 'Berat harus berupa angka.',
+                'berat.min'      => 'Berat minimal 0,1 kg.',
+                'berat.max'      => 'Berat maksimal 1000 kg.',
+            ]);
 
         try {
             // ✅ PERBAIKAN #1: Gunakan lockForUpdate() di dalam transaction
